@@ -7,7 +7,7 @@ import './src/utils/i18n';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <AppNavigator />
     </SafeAreaProvider>
   );

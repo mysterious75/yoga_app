@@ -3,15 +3,16 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
 
 const NUTRIENT_COLORS = {
-  calories: '#FF6B35',
-  protein: '#3498DB',
-  carbs: '#F39C12',
-  fat: '#E74C3C',
-  fiber: '#00B894',
+  calories: COLORS.nutrientCalories,
+  protein: COLORS.nutrientProtein,
+  carbs: COLORS.nutrientCarbs,
+  fat: COLORS.nutrientFat,
+  fiber: COLORS.nutrientFiber,
 };
 
 export default function FoodDetailScreen({ route, navigation }) {
@@ -20,49 +21,67 @@ export default function FoodDetailScreen({ route, navigation }) {
   const isHindi = i18n.language === 'hi';
 
   const nutrients = [
-    { label: isHindi ? 'कैलोरी' : 'Calories', value: food.caloriesPer100, unit: 'kcal', color: NUTRIENT_COLORS.calories, icon: '🔥' },
-    { label: isHindi ? 'प्रोटीन' : 'Protein', value: food.protein, unit: 'g', color: NUTRIENT_COLORS.protein, icon: '💪' },
-    { label: isHindi ? 'कार्ब्स' : 'Carbs', value: food.carbs, unit: 'g', color: NUTRIENT_COLORS.carbs, icon: '🌾' },
-    { label: isHindi ? 'वसा' : 'Fat', value: food.fat, unit: 'g', color: NUTRIENT_COLORS.fat, icon: '🫒' },
-    { label: isHindi ? 'फाइबर' : 'Fiber', value: food.fiber, unit: 'g', color: NUTRIENT_COLORS.fiber, icon: '🥬' },
+    { label: isHindi ? 'कैलोरी' : 'Calories', value: food.caloriesPer100, unit: 'kcal', color: NUTRIENT_COLORS.calories, icon: '⬡' },
+    { label: isHindi ? 'प्रोटीन' : 'Protein', value: food.protein, unit: 'g', color: NUTRIENT_COLORS.protein, icon: '◈' },
+    { label: isHindi ? 'कार्ब्स' : 'Carbs', value: food.carbs, unit: 'g', color: NUTRIENT_COLORS.carbs, icon: '◇' },
+    { label: isHindi ? 'वसा' : 'Fat', value: food.fat, unit: 'g', color: NUTRIENT_COLORS.fat, icon: '◉' },
+    { label: isHindi ? 'फाइबर' : 'Fiber', value: food.fiber, unit: 'g', color: NUTRIENT_COLORS.fiber, icon: '◎' },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isHindi ? food.nameHi : food.name}</Text>
-      </View>
+      {/* Header */}
+      <LinearGradient
+        colors={['#1B4332', '#0A0A0A']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Text style={styles.backText}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{isHindi ? food.nameHi : food.name}</Text>
+        </View>
+      </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Food Name Card */}
         <View style={styles.nameCard}>
-          <Text style={styles.foodName}>{isHindi ? food.nameHi : food.name}</Text>
-          <Text style={styles.foodNameEn}>{isHindi ? food.name : food.nameHi}</Text>
-          {food.glycemicIndex && (
-            <View style={styles.giBadge}>
-              <Text style={styles.giText}>GI: {food.glycemicIndex}</Text>
-            </View>
-          )}
+          <LinearGradient
+            colors={['rgba(45,106,79,0.3)', 'rgba(26,26,46,0.8)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.nameGradient}
+          >
+            <Text style={styles.foodName}>{isHindi ? food.nameHi : food.name}</Text>
+            <Text style={styles.foodNameEn}>{isHindi ? food.name : food.nameHi}</Text>
+            {food.glycemicIndex && (
+              <View style={styles.giBadge}>
+                <Text style={styles.giText}>GI: {food.glycemicIndex}</Text>
+              </View>
+            )}
+          </LinearGradient>
         </View>
 
         {/* Nutrients Grid */}
-        <Text style={styles.sectionTitle}>{isHindi ? '📊 पोषण (प्रति 100g)' : '📊 Nutrition (per 100g)'}</Text>
-        <View style={styles.nutrientsGrid}>
-          {nutrients.map((n, index) => (
-            <View key={index} style={[styles.nutrientCard, { borderLeftColor: n.color }]}>
-              <Text style={styles.nutrientIcon}>{n.icon}</Text>
-              <Text style={[styles.nutrientValue, { color: n.color }]}>{n.value}{n.unit}</Text>
-              <Text style={styles.nutrientLabel}>{n.label}</Text>
-            </View>
-          ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{isHindi ? '◈ पोषण (प्रति 100g)' : '◈ Nutrition (per 100g)'}</Text>
+          <View style={styles.sectionDivider} />
+          <View style={styles.nutrientsGrid}>
+            {nutrients.map((n, index) => (
+              <View key={index} style={[styles.nutrientCard, { borderLeftColor: n.color }]}>
+                <Text style={styles.nutrientIcon}>{n.icon}</Text>
+                <Text style={[styles.nutrientValue, { color: n.color }]}>{n.value}{n.unit}</Text>
+                <Text style={styles.nutrientLabel}>{n.label}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Portion Info */}
         <View style={styles.portionCard}>
-          <Text style={styles.portionTitle}>{isHindi ? '🍽️ एक हिस्सा' : '🍽️ One Portion'}</Text>
+          <Text style={styles.portionTitle}>{isHindi ? '◇ एक हिस्सा' : '◇ One Portion'}</Text>
           <View style={styles.portionRow}>
             <View style={styles.portionItem}>
               <Text style={styles.portionLabel}>{isHindi ? 'आकार' : 'Size'}</Text>
@@ -70,22 +89,25 @@ export default function FoodDetailScreen({ route, navigation }) {
             </View>
             <View style={styles.portionItem}>
               <Text style={styles.portionLabel}>{isHindi ? 'कैलोरी' : 'Calories'}</Text>
-              <Text style={[styles.portionValue, { color: COLORS.primary, fontWeight: '800' }]}>{food.portionCalories} kcal</Text>
+              <Text style={[styles.portionValue, { color: COLORS.accent, fontWeight: '800' }]}>{food.portionCalories} kcal</Text>
             </View>
           </View>
         </View>
 
         {/* Best Time to Eat */}
         <View style={styles.timingCard}>
-          <Text style={styles.timingTitle}>{isHindi ? '🕐 खाने का सबसे अच्छा समय' : '🕐 Best Time to Eat'}</Text>
-          <View style={styles.timingBadge}>
-            <Text style={styles.timingText}>{isHindi ? food.bestTimeHi : food.bestTime}</Text>
+          <View style={styles.timingAccent} />
+          <View style={styles.timingContent}>
+            <Text style={styles.timingTitle}>{isHindi ? '⏱ खाने का सबसे अच्छा समय' : '⏱ Best Time to Eat'}</Text>
+            <View style={styles.timingBadge}>
+              <Text style={styles.timingText}>{isHindi ? food.bestTimeHi : food.bestTime}</Text>
+            </View>
           </View>
         </View>
 
         {/* Nutrient Bar Visualization */}
         <View style={styles.barCard}>
-          <Text style={styles.barTitle}>{isHindi ? '📊 पोषण वितरण' : '📊 Nutrient Distribution'}</Text>
+          <Text style={styles.barTitle}>{isHindi ? '◈ पोषण वितरण' : '◈ Nutrient Distribution'}</Text>
           {nutrients.slice(1).map((n, index) => {
             const total = food.protein + food.carbs + food.fat + food.fiber;
             const percent = total > 0 ? (n.value / total) * 100 : 0;
@@ -93,7 +115,12 @@ export default function FoodDetailScreen({ route, navigation }) {
               <View key={index} style={styles.barRow}>
                 <Text style={styles.barLabel}>{n.label}</Text>
                 <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { width: `${percent}%`, backgroundColor: n.color }]} />
+                  <LinearGradient
+                    colors={[n.color + '80', n.color]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.barFill, { width: `${percent}%` }]}
+                  />
                 </View>
                 <Text style={[styles.barPercent, { color: n.color }]}>{Math.round(percent)}%</Text>
               </View>
@@ -103,7 +130,7 @@ export default function FoodDetailScreen({ route, navigation }) {
 
         {/* Tips */}
         <View style={styles.tipsCard}>
-          <Text style={styles.tipsTitle}>{isHindi ? '💡 टिप्स' : '💡 Tips'}</Text>
+          <Text style={styles.tipsTitle}>{isHindi ? '◈ टिप्स' : '◈ Tips'}</Text>
           {food.category === 'fruits' && (
             <Text style={styles.tipText}>
               {isHindi ? '• फल खाली पेट या भोजन के बीच में खाएं' : '• Eat fruits on empty stomach or between meals'}
@@ -132,65 +159,82 @@ export default function FoodDetailScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  headerGradient: {
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
-    paddingVertical: 12,
-    backgroundColor: COLORS.surface,
-    ...SHADOWS.small,
   },
   backBtn: { padding: 8, marginRight: 8 },
-  backText: { fontSize: 28, color: COLORS.text },
-  headerTitle: { fontSize: SIZES.lg, fontWeight: '700', color: COLORS.text },
+  backText: { fontSize: 28, color: '#fff' },
+  headerTitle: { fontSize: SIZES.lg, fontWeight: '800', color: '#fff' },
   nameCard: {
-    backgroundColor: COLORS.surface,
     margin: SIZES.padding,
-    padding: 20,
     borderRadius: SIZES.radiusLg,
+    overflow: 'hidden',
+    ...SHADOWS.glow,
+  },
+  nameGradient: {
+    padding: 24,
     alignItems: 'center',
-    ...SHADOWS.medium,
+    borderRadius: SIZES.radiusLg,
   },
   foodName: { fontSize: SIZES.xxl, fontWeight: '800', color: COLORS.text },
   foodNameEn: { fontSize: SIZES.md, color: COLORS.textSecondary, marginTop: 4 },
   giBadge: {
-    backgroundColor: COLORS.info + '15',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(76,201,240,0.2)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: SIZES.radiusFull,
-    marginTop: 10,
+    marginTop: 12,
   },
-  giText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.info },
+  giText: { fontSize: SIZES.sm, fontWeight: '700', color: COLORS.info },
+  section: {
+    paddingHorizontal: SIZES.padding,
+    marginBottom: 4,
+  },
   sectionTitle: {
     fontSize: SIZES.base,
     fontWeight: '700',
     color: COLORS.text,
-    marginHorizontal: SIZES.padding,
-    marginBottom: 10,
+  },
+  sectionDivider: {
+    width: 24,
+    height: 2,
+    backgroundColor: COLORS.primaryGlow,
+    borderRadius: 1,
+    marginTop: 6,
+    marginBottom: 12,
   },
   nutrientsGrid: {
-    paddingHorizontal: SIZES.padding,
     gap: 10,
   },
   nutrientCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
-    padding: 14,
+    padding: 16,
     borderRadius: SIZES.radius,
     borderLeftWidth: 4,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
-  nutrientIcon: { fontSize: 24, marginRight: 12 },
+  nutrientIcon: { fontSize: 22, marginRight: 12, color: COLORS.textSecondary },
   nutrientValue: { fontSize: SIZES.lg, fontWeight: '800', marginRight: 8 },
   nutrientLabel: { fontSize: SIZES.md, color: COLORS.textSecondary },
   portionCard: {
     backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
     marginTop: 14,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   portionTitle: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text, marginBottom: 12 },
   portionRow: { flexDirection: 'row', gap: 20 },
@@ -198,17 +242,27 @@ const styles = StyleSheet.create({
   portionLabel: { fontSize: SIZES.sm, color: COLORS.textSecondary },
   portionValue: { fontSize: SIZES.base, fontWeight: '600', color: COLORS.text, marginTop: 4 },
   timingCard: {
-    backgroundColor: COLORS.accent + '10',
+    flexDirection: 'row',
     marginHorizontal: SIZES.padding,
     marginTop: 14,
-    padding: 16,
     borderRadius: SIZES.radius,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.accent,
+    overflow: 'hidden',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.accent + '30',
+    ...SHADOWS.card,
+  },
+  timingAccent: {
+    width: 4,
+    backgroundColor: COLORS.accent,
+  },
+  timingContent: {
+    flex: 1,
+    padding: 16,
   },
   timingTitle: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text, marginBottom: 10 },
   timingBadge: {
-    backgroundColor: COLORS.accent + '20',
+    backgroundColor: 'rgba(212,163,115,0.15)',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: SIZES.radiusFull,
@@ -219,23 +273,27 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
     marginTop: 14,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   barTitle: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text, marginBottom: 12 },
   barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   barLabel: { width: 60, fontSize: SIZES.sm, color: COLORS.textSecondary },
-  barTrack: { flex: 1, height: 12, backgroundColor: COLORS.surfaceAlt, borderRadius: 6, marginHorizontal: 8, overflow: 'hidden' },
+  barTrack: { flex: 1, height: 12, backgroundColor: COLORS.backgroundAlt, borderRadius: 6, marginHorizontal: 8, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 6 },
   barPercent: { width: 40, fontSize: SIZES.sm, fontWeight: '700', textAlign: 'right' },
   tipsCard: {
     backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
     marginTop: 14,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   tipsTitle: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text, marginBottom: 10 },
   tipText: { fontSize: SIZES.md, color: COLORS.text, lineHeight: 22, marginBottom: 6 },

@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, View, StyleSheet } from 'react-native';
-import { COLORS } from '../utils/theme';
+import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -24,8 +24,11 @@ const Stack = createNativeStackNavigator();
 
 const TabIcon = ({ label, icon, focused, color }) => (
   <View style={styles.tabItem}>
-    <Text style={[styles.tabIcon, { color }]}>{icon}</Text>
-    <Text style={[styles.tabLabel, { color, fontWeight: focused ? '700' : '400' }]}>{label}</Text>
+    <View style={[styles.tabIconWrap, focused && styles.tabIconWrapActive]}>
+      <Text style={[styles.tabIcon, { color: focused ? '#fff' : COLORS.textLight }]}>{icon}</Text>
+    </View>
+    {focused && <View style={styles.activeIndicator} />}
+    <Text style={[styles.tabLabel, { color: focused ? COLORS.primaryGlow : COLORS.textLight, fontWeight: focused ? '700' : '400' }]}>{label}</Text>
   </View>
 );
 
@@ -66,14 +69,15 @@ function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: COLORS.surface,
-          borderTopWidth: 0,
-          height: 85,
-          paddingBottom: 20,
+          backgroundColor: '#0F0F1A',
+          borderTopWidth: 1,
+          borderTopColor: COLORS.border,
+          height: 88,
+          paddingBottom: 22,
           paddingTop: 10,
-          ...styles.shadow,
+          ...SHADOWS.large,
         },
-        tabBarActiveTintColor: COLORS.primary,
+        tabBarActiveTintColor: COLORS.primaryGlow,
         tabBarInactiveTintColor: COLORS.textLight,
         tabBarShowLabel: false,
       }}
@@ -83,7 +87,7 @@ function MainTabs() {
         component={HomeStack}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon label="Home" icon="🏠" focused={focused} color={color} />
+            <TabIcon label="Home" icon="⌂" focused={focused} color={color} />
           ),
         }}
       />
@@ -92,7 +96,7 @@ function MainTabs() {
         component={YogaStack}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon label="Yoga" icon="🧘" focused={focused} color={color} />
+            <TabIcon label="Yoga" icon="◎" focused={focused} color={color} />
           ),
         }}
       />
@@ -101,7 +105,7 @@ function MainTabs() {
         component={TrackerScreen}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon label="Tracker" icon="📊" focused={focused} color={color} />
+            <TabIcon label="Tracker" icon="◈" focused={focused} color={color} />
           ),
         }}
       />
@@ -110,7 +114,7 @@ function MainTabs() {
         component={DietStack}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon label="Diet" icon="🍽️" focused={focused} color={color} />
+            <TabIcon label="Diet" icon="◇" focused={focused} color={color} />
           ),
         }}
       />
@@ -119,7 +123,7 @@ function MainTabs() {
         component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <TabIcon label="Profile" icon="👤" focused={focused} color={color} />
+            <TabIcon label="Profile" icon="○" focused={focused} color={color} />
           ),
         }}
       />
@@ -141,20 +145,32 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 60,
+    width: 56,
+  },
+  tabIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+  tabIconWrapActive: {
+    backgroundColor: COLORS.primaryDark,
   },
   tabIcon: {
-    fontSize: 24,
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  activeIndicator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.primaryGlow,
+    marginBottom: 2,
   },
   tabLabel: {
     fontSize: 10,
-  },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 10,
+    letterSpacing: 0.3,
   },
 });

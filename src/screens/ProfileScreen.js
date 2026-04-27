@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, Alert, Switch, TextInput,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,37 +15,37 @@ const MENU_SECTIONS = [
     titleEn: 'Account',
     titleHi: 'खाता',
     items: [
-      { id: 'edit_profile', icon: '👤', en: 'Edit Profile', hi: 'प्रोफ़ाइल संपादित करें' },
-      { id: 'goals', icon: '🎯', en: 'Health Goals', hi: 'स्वास्थ्य लक्ष्य' },
-      { id: 'progress', icon: '📈', en: 'My Progress', hi: 'मेरी प्रगति' },
+      { id: 'edit_profile', icon: '○', en: 'Edit Profile', hi: 'प्रोफ़ाइल संपादित करें' },
+      { id: 'goals', icon: '◉', en: 'Health Goals', hi: 'स्वास्थ्य लक्ष्य' },
+      { id: 'progress', icon: '▤', en: 'My Progress', hi: 'मेरी प्रगति' },
     ],
   },
   {
     titleEn: 'Preferences',
     titleHi: 'प्राथमिकताएं',
     items: [
-      { id: 'language', icon: '🌐', en: 'Language', hi: 'भाषा' },
-      { id: 'notifications', icon: '🔔', en: 'Notifications', hi: 'सूचनाएं' },
-      { id: 'units', icon: '📏', en: 'Units (kg/lb)', hi: 'इकाइयां (kg/lb)' },
+      { id: 'language', icon: '◎', en: 'Language', hi: 'भाषा' },
+      { id: 'notifications', icon: '◈', en: 'Notifications', hi: 'सूचनाएं' },
+      { id: 'units', icon: '▥', en: 'Units (kg/lb)', hi: 'इकाइयां (kg/lb)' },
     ],
   },
   {
     titleEn: 'Support',
     titleHi: 'सहायता',
     items: [
-      { id: 'help', icon: '❓', en: 'Help & FAQ', hi: 'सहायता और FAQ' },
-      { id: 'feedback', icon: '💬', en: 'Send Feedback', hi: 'प्रतिक्रिया भेजें' },
-      { id: 'share', icon: '📤', en: 'Share App', hi: 'ऐप शेयर करें' },
-      { id: 'rate', icon: '⭐', en: 'Rate Us', hi: 'हमें रेट करें' },
+      { id: 'help', icon: '?', en: 'Help & FAQ', hi: 'सहायता और FAQ' },
+      { id: 'feedback', icon: '◇', en: 'Send Feedback', hi: 'प्रतिक्रिया भेजें' },
+      { id: 'share', icon: '↗', en: 'Share App', hi: 'ऐप शेयर करें' },
+      { id: 'rate', icon: '★', en: 'Rate Us', hi: 'हमें रेट करें' },
     ],
   },
   {
     titleEn: 'About',
     titleHi: 'जानकारी',
     items: [
-      { id: 'terms', icon: '📄', en: 'Terms of Service', hi: 'सेवा की शर्तें' },
-      { id: 'privacy', icon: '🔒', en: 'Privacy Policy', hi: 'गोपनीयता नीति' },
-      { id: 'version', icon: 'ℹ️', en: 'Version 1.0.0', hi: 'संस्करण 1.0.0' },
+      { id: 'terms', icon: '▤', en: 'Terms of Service', hi: 'सेवा की शर्तें' },
+      { id: 'privacy', icon: '⊘', en: 'Privacy Policy', hi: 'गोपनीयता नीति' },
+      { id: 'version', icon: 'ℹ', en: 'Version 1.0.0', hi: 'संस्करण 1.0.0' },
     ],
   },
 ];
@@ -108,15 +109,13 @@ export default function ProfileScreen({ navigation }) {
         break;
       case 'goals':
         Alert.alert(
-          isHindi ? '🎯 स्वास्थ्य लक्ष्य' : '🎯 Health Goals',
-          isHindi
-            ? 'जल्द ही उपलब्ध होगा'
-            : 'Coming soon'
+          isHindi ? '◉ स्वास्थ्य लक्ष्य' : '◉ Health Goals',
+          isHindi ? 'जल्द ही उपलब्ध होगा' : 'Coming soon'
         );
         break;
       case 'share':
         Alert.alert(
-          isHindi ? '📤 शेयर करें' : '📤 Share',
+          isHindi ? '↗ शेयर करें' : '↗ Share',
           isHindi
             ? 'YogaFit Pro - आपका पूर्ण स्वास्थ्य साथी!\n\nडाउनलोड करें: yogafitpro.com'
             : 'YogaFit Pro - Your complete health companion!\n\nDownload: yogafitpro.com'
@@ -124,26 +123,20 @@ export default function ProfileScreen({ navigation }) {
         break;
       case 'rate':
         Alert.alert(
-          isHindi ? '⭐ रेटिंग' : '⭐ Rating',
-          isHindi
-            ? 'App Store / Play Store पर रेट करें'
-            : 'Rate us on App Store / Play Store'
+          isHindi ? '★ रेटिंग' : '★ Rating',
+          isHindi ? 'App Store / Play Store पर रेट करें' : 'Rate us on App Store / Play Store'
         );
         break;
       case 'help':
         Alert.alert(
-          isHindi ? '❓ सहायता' : '❓ Help',
-          isHindi
-            ? 'ईमेल करें: support@yogafitpro.com'
-            : 'Email us: support@yogafitpro.com'
+          isHindi ? '? सहायता' : '? Help',
+          isHindi ? 'ईमेल करें: support@yogafitpro.com' : 'Email us: support@yogafitpro.com'
         );
         break;
       case 'feedback':
         Alert.alert(
-          isHindi ? '💬 प्रतिक्रिया' : '💬 Feedback',
-          isHindi
-            ? 'अपनी प्रतिक्रिया भेजें: feedback@yogafitpro.com'
-            : 'Send feedback to: feedback@yogafitpro.com'
+          isHindi ? '◇ प्रतिक्रिया' : '◇ Feedback',
+          isHindi ? 'अपनी प्रतिक्रिया भेजें: feedback@yogafitpro.com' : 'Send feedback to: feedback@yogafitpro.com'
         );
         break;
       default:
@@ -157,16 +150,24 @@ export default function ProfileScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            {isHindi ? '👤 प्रोफ़ाइल' : '👤 Profile'}
+            {isHindi ? '○ प्रोफ़ाइल' : '○ Profile'}
           </Text>
         </View>
 
         {/* Profile Card */}
-        <View style={styles.profileCard}>
+        <LinearGradient
+          colors={[COLORS.surface, COLORS.surfaceAlt]}
+          style={styles.profileCard}
+        >
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarEmoji}>
-              {profile.name ? profile.name[0].toUpperCase() : '🧘'}
-            </Text>
+            <LinearGradient
+              colors={[COLORS.primaryDark, COLORS.primary]}
+              style={styles.avatarGradient}
+            >
+              <Text style={styles.avatarEmoji}>
+                {profile.name ? profile.name[0].toUpperCase() : '◎'}
+              </Text>
+            </LinearGradient>
           </View>
 
           {isEditing ? (
@@ -213,10 +214,15 @@ export default function ProfileScreen({ navigation }) {
                   placeholderTextColor={COLORS.textLight}
                 />
               </View>
-              <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
-                <Text style={styles.saveBtnText}>
-                  {isHindi ? '💾 सेव करें' : '💾 Save'}
-                </Text>
+              <TouchableOpacity style={styles.saveBtnWrap} onPress={saveProfile}>
+                <LinearGradient
+                  colors={[COLORS.primaryDark, COLORS.primary]}
+                  style={styles.saveBtn}
+                >
+                  <Text style={styles.saveBtnText}>
+                    {isHindi ? '💾 सेव करें' : '💾 Save'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           ) : (
@@ -235,25 +241,34 @@ export default function ProfileScreen({ navigation }) {
               )}
             </View>
           )}
-        </View>
+        </LinearGradient>
 
         {/* Premium Banner */}
         <TouchableOpacity
-          style={styles.premiumBanner}
+          style={styles.premiumBannerWrap}
           onPress={() => navigation.navigate('Subscription')}
         >
-          <View style={styles.premiumContent}>
-            <Text style={styles.premiumEmoji}>⭐</Text>
-            <View style={styles.premiumText}>
-              <Text style={styles.premiumTitle}>
-                {isHindi ? 'प्रीमियम में अपग्रेड करें' : 'Upgrade to Premium'}
-              </Text>
-              <Text style={styles.premiumDesc}>
-                {isHindi ? 'सभी सुविधाएं अनलॉक करें' : 'Unlock all features'}
-              </Text>
+          <LinearGradient
+            colors={[COLORS.primaryDark, COLORS.primary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.premiumBanner}
+          >
+            <View style={styles.premiumContent}>
+              <View style={styles.premiumIconWrap}>
+                <Text style={styles.premiumEmoji}>★</Text>
+              </View>
+              <View style={styles.premiumTextWrap}>
+                <Text style={styles.premiumTitle}>
+                  {isHindi ? 'प्रीमियम में अपग्रेड करें' : 'Upgrade to Premium'}
+                </Text>
+                <Text style={styles.premiumDesc}>
+                  {isHindi ? 'सभी सुविधाएं अनलॉक करें' : 'Unlock all features'}
+                </Text>
+              </View>
             </View>
-          </View>
-          <Text style={styles.premiumArrow}>›</Text>
+            <Text style={styles.premiumArrow}>›</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Menu Sections */}
@@ -281,7 +296,7 @@ export default function ProfileScreen({ navigation }) {
                       value={notificationsEnabled}
                       onValueChange={setNotificationsEnabled}
                       trackColor={{ false: COLORS.border, true: COLORS.primary + '60' }}
-                      thumbColor={notificationsEnabled ? COLORS.primary : COLORS.textLight}
+                      thumbColor={notificationsEnabled ? COLORS.primaryGlow : COLORS.textLight}
                     />
                   ) : item.id === 'language' ? (
                     <Text style={styles.menuValue}>
@@ -311,7 +326,7 @@ export default function ProfileScreen({ navigation }) {
           }}
         >
           <Text style={styles.logoutText}>
-            {isHindi ? '🚪 लॉगआउट' : '🚪 Logout'}
+            {isHindi ? '↗ लॉगआउट' : '↗ Logout'}
           </Text>
         </TouchableOpacity>
 
@@ -319,7 +334,7 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.footer}>
           <Text style={styles.footerText}>YogaFit Pro v1.0.0</Text>
           <Text style={styles.footerText}>
-            {isHindi ? 'भारत में ❤️ से बनाया' : 'Made with ❤️ in India'}
+            {isHindi ? 'भारत में ♡ से बनाया' : 'Made with ♡ in India'}
           </Text>
         </View>
 
@@ -336,37 +351,44 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
     backgroundColor: COLORS.surface,
-    ...SHADOWS.small,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   headerTitle: { fontSize: SIZES.xxl, fontWeight: '800', color: COLORS.text },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
     marginTop: 16,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   avatarCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.primary + '15',
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    overflow: 'hidden',
+    ...SHADOWS.glow,
+  },
+  avatarGradient: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarEmoji: { fontSize: 28, fontWeight: '700', color: COLORS.primary },
-  profileInfo: { flex: 1, marginLeft: 14 },
+  avatarEmoji: { fontSize: 28, fontWeight: '700', color: '#fff' },
+  profileInfo: { flex: 1, marginLeft: 16 },
   profileName: { fontSize: SIZES.lg, fontWeight: '700', color: COLORS.text },
   profileDetail: { fontSize: SIZES.xs, color: COLORS.textSecondary, marginTop: 4 },
   profileHint: { fontSize: SIZES.sm, color: COLORS.textLight, marginTop: 4 },
-  editForm: { flex: 1, marginLeft: 14 },
+  editForm: { flex: 1, marginLeft: 16 },
   editInput: {
     backgroundColor: COLORS.surfaceAlt,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: SIZES.radius,
     fontSize: SIZES.sm,
     color: COLORS.text,
@@ -375,46 +397,62 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   editRow: { flexDirection: 'row' },
+  saveBtnWrap: {
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+  },
   saveBtn: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: SIZES.radius,
     alignItems: 'center',
   },
   saveBtnText: { fontSize: SIZES.md, fontWeight: '700', color: '#fff' },
+  premiumBannerWrap: {
+    marginHorizontal: SIZES.padding,
+    marginTop: 16,
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+    ...SHADOWS.glow,
+  },
   premiumBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary + '10',
-    marginHorizontal: SIZES.padding,
-    marginTop: 16,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    borderWidth: 1,
-    borderColor: COLORS.primary + '30',
   },
   premiumContent: { flex: 1, flexDirection: 'row', alignItems: 'center' },
-  premiumEmoji: { fontSize: 28, marginRight: 12 },
-  premiumText: {},
-  premiumTitle: { fontSize: SIZES.md, fontWeight: '700', color: COLORS.primary },
-  premiumDesc: { fontSize: SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
-  premiumArrow: { fontSize: 24, color: COLORS.primary, fontWeight: '300' },
+  premiumIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  premiumEmoji: { fontSize: 22, color: '#fff' },
+  premiumTextWrap: {},
+  premiumTitle: { fontSize: SIZES.md, fontWeight: '700', color: '#fff' },
+  premiumDesc: { fontSize: SIZES.xs, color: '#ffffffaa', marginTop: 2 },
+  premiumArrow: { fontSize: 28, color: '#ffffffaa', fontWeight: '300' },
   menuSection: {
     marginTop: 20,
     paddingHorizontal: SIZES.padding,
   },
   menuSectionTitle: {
-    fontSize: SIZES.sm,
+    fontSize: SIZES.xs,
     fontWeight: '600',
     color: COLORS.textSecondary,
     marginBottom: 8,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
   menuCard: {
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   menuItem: {
     flexDirection: 'row',
@@ -426,7 +464,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
-  menuIcon: { fontSize: 18, marginRight: 14 },
+  menuIcon: { fontSize: 18, marginRight: 14, color: COLORS.textSecondary, width: 20, textAlign: 'center' },
   menuLabel: { flex: 1, fontSize: SIZES.md, color: COLORS.text },
   menuValue: { fontSize: SIZES.sm, color: COLORS.textSecondary, marginRight: 8 },
   menuArrow: { fontSize: 22, color: COLORS.textLight, fontWeight: '300' },
@@ -434,7 +472,7 @@ const styles = StyleSheet.create({
     marginHorizontal: SIZES.padding,
     marginTop: 24,
     paddingVertical: 14,
-    backgroundColor: COLORS.error + '10',
+    backgroundColor: COLORS.error + '15',
     borderRadius: SIZES.radius,
     alignItems: 'center',
     borderWidth: 1,

@@ -3,13 +3,13 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, Dimensions, Animated,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
 import { getFavorites, toggleFavorite } from '../utils/favorites';
 
 const { width } = Dimensions.get('window');
 
-// Animated yoga pose component using simple CSS-like animation
 const YogaAnimation = ({ poseId }) => {
   const fadeAnim = useRef(new Animated.Value(0.3)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
@@ -30,10 +30,19 @@ const YogaAnimation = ({ poseId }) => {
   }, []);
 
   return (
-    <Animated.View style={[styles.animationContainer, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-      <Text style={styles.animationEmoji}>🧘‍♀️</Text>
-      <Text style={styles.animationText}>Follow the steps below</Text>
-    </Animated.View>
+    <View style={styles.animationOuter}>
+      <LinearGradient
+        colors={['rgba(27,67,50,0.4)', 'rgba(10,10,10,0.8)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.animationContainer}
+      >
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+          <Text style={styles.animationEmoji}>◎</Text>
+          <Text style={styles.animationText}>Follow the steps below</Text>
+        </Animated.View>
+      </LinearGradient>
+    </View>
   );
 };
 
@@ -53,26 +62,33 @@ export default function YogaDetailScreen({ route, navigation }) {
     setIsFav(newList.includes(pose.id));
   };
 
-  const difficultyStars = '⭐'.repeat(pose.difficulty);
+  const difficultyStars = '●'.repeat(pose.difficulty);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle}>{isHindi ? pose.nameHi : pose.name}</Text>
-          <Text style={styles.headerSubtitle}>{pose.sanskrit}</Text>
+      <LinearGradient
+        colors={['#1B4332', '#0A0A0A']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Text style={styles.backText}>←</Text>
+          </TouchableOpacity>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle}>{isHindi ? pose.nameHi : pose.name}</Text>
+            <Text style={styles.headerSubtitle}>{pose.sanskrit}</Text>
+          </View>
+          <View style={styles.calorieBadge}>
+            <Text style={styles.calorieText}>⬡ {pose.caloriesPerMin}/min</Text>
+          </View>
+          <TouchableOpacity style={styles.favBtn} onPress={handleToggleFav}>
+            <Text style={[styles.favIcon, isFav && { color: COLORS.error }]}>{isFav ? '♥' : '♡'}</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.calorieBadge}>
-          <Text style={styles.calorieText}>🔥 {pose.caloriesPerMin}/min</Text>
-        </View>
-        <TouchableOpacity style={styles.favBtn} onPress={handleToggleFav}>
-          <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
-        </TouchableOpacity>
-      </View>
+      </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Animation Area */}
@@ -80,36 +96,33 @@ export default function YogaDetailScreen({ route, navigation }) {
 
         {/* Quick Info */}
         <View style={styles.infoRow}>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoIcon}>⏱️</Text>
-            <Text style={styles.infoLabel}>{isHindi ? 'अवधि' : 'Duration'}</Text>
-            <Text style={styles.infoValue}>{pose.duration}</Text>
-          </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoIcon}>🔥</Text>
-            <Text style={styles.infoLabel}>{isHindi ? 'कैलोरी' : 'Calories'}</Text>
-            <Text style={styles.infoValue}>{pose.caloriesPerMin}/min</Text>
-          </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoIcon}>📊</Text>
-            <Text style={styles.infoLabel}>{isHindi ? 'कठिनाई' : 'Difficulty'}</Text>
-            <Text style={styles.infoValue}>{difficultyStars}</Text>
-          </View>
+          {[
+            { icon: '⏱', label: isHindi ? 'अवधि' : 'Duration', value: pose.duration },
+            { icon: '⬡', label: isHindi ? 'कैलोरी' : 'Calories', value: `${pose.caloriesPerMin}/min` },
+            { icon: '◉', label: isHindi ? 'कठिनाई' : 'Difficulty', value: difficultyStars },
+          ].map((info, i) => (
+            <View key={i} style={styles.infoCard}>
+              <Text style={styles.infoIcon}>{info.icon}</Text>
+              <Text style={styles.infoLabel}>{info.label}</Text>
+              <Text style={styles.infoValue}>{info.value}</Text>
+            </View>
+          ))}
         </View>
 
-        {/* Tab Buttons */}
+        {/* Tab Buttons - underline style */}
         <View style={styles.tabRow}>
           {['steps', 'benefits', 'precautions'].map(tab => (
             <TouchableOpacity
               key={tab}
-              style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
+              style={styles.tabBtn}
               onPress={() => setActiveTab(tab)}
             >
               <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'steps' ? (isHindi ? '📋 चरण' : '📋 Steps')
-                  : tab === 'benefits' ? (isHindi ? '✅ फ़ायदे' : '✅ Benefits')
-                  : (isHindi ? '⚠️ सावधानी' : '⚠️ Precautions')}
+                {tab === 'steps' ? (isHindi ? '⊞ चरण' : '⊞ Steps')
+                  : tab === 'benefits' ? (isHindi ? '✓ फ़ायदे' : '✓ Benefits')
+                  : (isHindi ? '⚠ सावधानी' : '⚠ Precautions')}
               </Text>
+              {activeTab === tab && <View style={styles.tabUnderline} />}
             </TouchableOpacity>
           ))}
         </View>
@@ -133,7 +146,7 @@ export default function YogaDetailScreen({ route, navigation }) {
             <View>
               {(isHindi ? pose.benefitsHi : pose.benefits).map((benefit, index) => (
                 <View key={index} style={styles.benefitRow}>
-                  <Text style={styles.bullet}>✅</Text>
+                  <Text style={styles.bullet}>✓</Text>
                   <Text style={styles.benefitText}>{benefit}</Text>
                 </View>
               ))}
@@ -144,7 +157,7 @@ export default function YogaDetailScreen({ route, navigation }) {
             <View>
               {(isHindi ? pose.precautionsHi : pose.precautions).map((precaution, index) => (
                 <View key={index} style={styles.benefitRow}>
-                  <Text style={styles.bullet}>⚠️</Text>
+                  <Text style={[styles.bullet, { color: COLORS.warning }]}>⚠</Text>
                   <Text style={styles.benefitText}>{precaution}</Text>
                 </View>
               ))}
@@ -169,9 +182,15 @@ export default function YogaDetailScreen({ route, navigation }) {
           <Text style={styles.tagsTitle}>{isHindi ? 'श्रेणियां' : 'Categories'}</Text>
           <View style={styles.tagsRow}>
             {pose.category.map((cat, index) => (
-              <View key={index} style={[styles.tag, { backgroundColor: COLORS.primary + '20' }]}>
-                <Text style={[styles.tagText, { color: COLORS.primary }]}>{cat.replace(/_/g, ' ')}</Text>
-              </View>
+              <LinearGradient
+                key={index}
+                colors={['rgba(45,106,79,0.3)', 'rgba(45,106,79,0.1)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.tag}
+              >
+                <Text style={[styles.tagText, { color: COLORS.primaryGlow }]}>{cat.replace(/_/g, ' ')}</Text>
+              </LinearGradient>
             ))}
           </View>
         </View>
@@ -184,37 +203,42 @@ export default function YogaDetailScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  headerGradient: {
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
-    paddingVertical: 12,
-    backgroundColor: COLORS.surface,
-    ...SHADOWS.small,
   },
   backBtn: { padding: 8 },
-  backText: { fontSize: 28, color: COLORS.text },
+  backText: { fontSize: 28, color: '#fff' },
   headerInfo: { flex: 1, marginLeft: 8 },
-  headerTitle: { fontSize: SIZES.lg, fontWeight: '700', color: COLORS.text },
-  headerSubtitle: { fontSize: SIZES.xs, color: COLORS.textSecondary, fontStyle: 'italic' },
+  headerTitle: { fontSize: SIZES.lg, fontWeight: '800', color: '#fff' },
+  headerSubtitle: { fontSize: SIZES.xs, color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' },
   calorieBadge: {
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: 'rgba(212,163,115,0.2)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: SIZES.radiusFull,
   },
-  calorieText: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.primary },
+  calorieText: { fontSize: SIZES.xs, fontWeight: '700', color: COLORS.accent },
   favBtn: { padding: 8 },
-  favIcon: { fontSize: 22 },
-  animationContainer: {
-    height: 220,
-    backgroundColor: COLORS.primary + '08',
-    alignItems: 'center',
-    justifyContent: 'center',
+  favIcon: { fontSize: 22, color: '#fff' },
+  animationOuter: {
     margin: SIZES.padding,
     borderRadius: SIZES.radiusLg,
+    overflow: 'hidden',
+    ...SHADOWS.glow,
   },
-  animationEmoji: { fontSize: 80 },
+  animationContainer: {
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: SIZES.radiusLg,
+  },
+  animationEmoji: { fontSize: 64, color: COLORS.primaryGlow, textAlign: 'center' },
   animationText: { fontSize: SIZES.sm, color: COLORS.textSecondary, marginTop: 8 },
   infoRow: {
     flexDirection: 'row',
@@ -225,41 +249,48 @@ const styles = StyleSheet.create({
   infoCard: {
     flex: 1,
     backgroundColor: COLORS.surface,
-    padding: 12,
+    padding: 14,
     borderRadius: SIZES.radius,
     alignItems: 'center',
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
-  infoIcon: { fontSize: 20, marginBottom: 4 },
+  infoIcon: { fontSize: 20, color: COLORS.primaryGlow, marginBottom: 6 },
   infoLabel: { fontSize: SIZES.xs, color: COLORS.textSecondary },
   infoValue: { fontSize: SIZES.sm, fontWeight: '700', color: COLORS.text, marginTop: 2 },
   tabRow: {
     flexDirection: 'row',
     paddingHorizontal: SIZES.padding,
-    gap: 8,
+    gap: 0,
     marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.surfaceBorder,
   },
   tabBtn: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: SIZES.radiusFull,
-    backgroundColor: COLORS.surface,
+    paddingVertical: 12,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
-  tabBtnActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  tabText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.text },
+  tabUnderline: {
+    position: 'absolute',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
+    height: 3,
+    backgroundColor: COLORS.primaryGlow,
+    borderRadius: 2,
   },
-  tabText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.text },
-  tabTextActive: { color: '#fff' },
   contentCard: {
     backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   stepRow: {
     flexDirection: 'row',
@@ -270,20 +301,20 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
     marginTop: 2,
   },
-  stepNumText: { fontSize: SIZES.sm, fontWeight: '700', color: '#fff' },
+  stepNumText: { fontSize: SIZES.sm, fontWeight: '700', color: COLORS.primaryGlow },
   stepText: { flex: 1, fontSize: SIZES.md, color: COLORS.text, lineHeight: 22 },
   benefitRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  bullet: { marginRight: 10, fontSize: 16, marginTop: 2 },
+  bullet: { marginRight: 10, fontSize: 16, marginTop: 2, color: COLORS.primaryGlow },
   benefitText: { flex: 1, fontSize: SIZES.md, color: COLORS.text, lineHeight: 22 },
   tagsContainer: {
     paddingHorizontal: SIZES.padding,
@@ -301,10 +332,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: COLORS.accent + '20',
+    backgroundColor: COLORS.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: SIZES.radiusFull,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
-  tagText: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.accent, textTransform: 'capitalize' },
+  tagText: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.textSecondary, textTransform: 'capitalize' },
 });

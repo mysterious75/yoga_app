@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, Dimensions, FlatList, TextInput,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { YOGA_CATEGORIES, YOGA_POSES } from '../data/yogaPoses';
 import { useTranslation } from 'react-i18next';
@@ -10,8 +11,8 @@ import { getFavorites, toggleFavorite } from '../utils/favorites';
 
 const { width } = Dimensions.get('window');
 
-const DIFFICULTY_LABELS = ['', '🌱 Beginner', '🌿 Intermediate', '🌳 Advanced'];
-const DIFFICULTY_LABELS_HI = ['', '🌱 शुरुआती', '🌿 मध्यम', '🌳 उन्नत'];
+const DIFFICULTY_LABELS = ['', '● Beginner', '●● Intermediate', '●●● Advanced'];
+const DIFFICULTY_LABELS_HI = ['', '● शुरुआती', '●● मध्यम', '●●● उन्नत'];
 
 export default function YogaScreen({ navigation }) {
   const { i18n } = useTranslation();
@@ -51,34 +52,17 @@ export default function YogaScreen({ navigation }) {
     return poses;
   }, [selectedCategory, search, favoriteIds]);
 
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryChip,
-        selectedCategory === item.id && { backgroundColor: item.color },
-      ]}
-      onPress={() => setSelectedCategory(item.id)}
-    >
-      <Text style={styles.categoryIcon}>{item.icon}</Text>
-      <Text style={[
-        styles.categoryText,
-        selectedCategory === item.id && { color: '#fff' },
-      ]}>
-        {isHindi ? item.nameHi : item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-
   const renderPoseCard = ({ item }) => {
     const isFav = favoriteIds.includes(item.id);
     return (
       <TouchableOpacity
         style={styles.poseCard}
         onPress={() => navigation.navigate('YogaDetail', { pose: item })}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
       >
-        <View style={[styles.poseAnimation, { backgroundColor: COLORS.primary + '15' }]}>
-          <Text style={styles.poseEmoji}>🧘</Text>
+        <View style={styles.poseAccent} />
+        <View style={[styles.poseIconWrap, { backgroundColor: COLORS.primaryDark + '40' }]}>
+          <Text style={styles.poseEmoji}>◎</Text>
         </View>
         <View style={styles.poseInfo}>
           <Text style={styles.poseName}>{isHindi ? item.nameHi : item.name}</Text>
@@ -87,14 +71,14 @@ export default function YogaScreen({ navigation }) {
             <Text style={styles.difficulty}>
               {isHindi ? DIFFICULTY_LABELS_HI[item.difficulty] : DIFFICULTY_LABELS[item.difficulty]}
             </Text>
-            <Text style={styles.duration}>⏱️ {item.duration}</Text>
+            <Text style={styles.duration}>⏱ {item.duration}</Text>
           </View>
         </View>
         <TouchableOpacity
           style={styles.favBtn}
           onPress={() => handleToggleFavorite(item.id)}
         >
-          <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
+          <Text style={[styles.favIcon, isFav && { color: COLORS.error }]}>{isFav ? '♥' : '♡'}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -104,7 +88,7 @@ export default function YogaScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
-          {isHindi ? '🧘 योग आसन' : '🧘 Yoga Poses'}
+          {isHindi ? '◎ योग आसन' : '◎ Yoga Poses'}
         </Text>
         <Text style={styles.subtitle}>
           {isHindi ? `${YOGA_POSES.length}+ आसन सीखें` : `Learn ${YOGA_POSES.length}+ poses`}
@@ -113,69 +97,56 @@ export default function YogaScreen({ navigation }) {
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          value={search}
-          onChangeText={setSearch}
-          placeholder={isHindi ? 'आसन खोजें...' : 'Search poses...'}
-          placeholderTextColor={COLORS.textLight}
-        />
-        {search ? (
-          <TouchableOpacity style={styles.clearBtn} onPress={() => setSearch('')}>
-            <Text style={styles.clearText}>✕</Text>
-          </TouchableOpacity>
-        ) : null}
+        <View style={styles.searchWrap}>
+          <Text style={styles.searchIcon}>⌕</Text>
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder={isHindi ? 'आसन खोजें...' : 'Search poses...'}
+            placeholderTextColor={COLORS.textLight}
+          />
+          {search ? (
+            <TouchableOpacity style={styles.clearBtn} onPress={() => setSearch('')}>
+              <Text style={styles.clearText}>✕</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
 
       {/* Categories */}
       <View style={styles.categoriesContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesList}>
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              selectedCategory === 'all' && { backgroundColor: COLORS.primary },
-            ]}
-            onPress={() => setSelectedCategory('all')}
-          >
-            <Text style={styles.categoryIcon}>📋</Text>
-            <Text style={[
-              styles.categoryText,
-              selectedCategory === 'all' && { color: '#fff' },
-            ]}>
-              {isHindi ? 'सभी' : 'All'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              selectedCategory === 'favorites' && { backgroundColor: '#E74C3C' },
-            ]}
-            onPress={() => setSelectedCategory('favorites')}
-          >
-            <Text style={styles.categoryIcon}>❤️</Text>
-            <Text style={[
-              styles.categoryText,
-              selectedCategory === 'favorites' && { color: '#fff' },
-            ]}>
-              {isHindi ? 'पसंदीदा' : 'Favorites'}
-            </Text>
-          </TouchableOpacity>
-          {YOGA_CATEGORIES.map(cat => (
+          {[
+            { id: 'all', icon: '⊞', name: 'All', nameHi: 'सभी' },
+            { id: 'favorites', icon: '♥', name: 'Favorites', nameHi: 'पसंदीदा' },
+            ...YOGA_CATEGORIES,
+          ].map(cat => (
             <TouchableOpacity
               key={cat.id}
-              style={[
-                styles.categoryChip,
-                selectedCategory === cat.id && { backgroundColor: cat.color },
-              ]}
+              style={styles.categoryChipWrap}
               onPress={() => setSelectedCategory(cat.id)}
             >
-              <Text style={styles.categoryIcon}>{cat.icon}</Text>
-              <Text style={[
-                styles.categoryText,
-                selectedCategory === cat.id && { color: '#fff' },
-              ]}>
-                {isHindi ? cat.nameHi : cat.name}
-              </Text>
+              {selectedCategory === cat.id ? (
+                <LinearGradient
+                  colors={['#1B4332', '#2D6A4F']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.categoryChip}
+                >
+                  <Text style={styles.categoryIconActive}>{cat.icon}</Text>
+                  <Text style={styles.categoryTextActive}>
+                    {isHindi ? cat.nameHi : cat.name}
+                  </Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.categoryChip}>
+                  <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                  <Text style={styles.categoryText}>
+                    {isHindi ? cat.nameHi : cat.name}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -190,12 +161,12 @@ export default function YogaScreen({ navigation }) {
         contentContainerStyle={styles.posesList}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>
-              {selectedCategory === 'favorites' ? '❤️' : '🔍'}
+            <Text style={styles.emptyIcon}>
+              {selectedCategory === 'favorites' ? '♡' : '⌕'}
             </Text>
             <Text style={styles.emptyText}>
               {selectedCategory === 'favorites'
-                ? (isHindi ? 'अभी कोई पसंदीदा नहीं\n❤️ दबाकर जोड़ें' : 'No favorites yet\nTap ❤️ to add')
+                ? (isHindi ? 'अभी कोई पसंदीदा नहीं\n♥ दबाकर जोड़ें' : 'No favorites yet\nTap ♥ to add')
                 : (isHindi ? 'कोई आसन नहीं मिला' : 'No poses found')}
             </Text>
           </View>
@@ -213,45 +184,58 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: SIZES.padding,
     paddingTop: 20,
-    paddingBottom: 10,
+    paddingBottom: 8,
   },
   title: {
     fontSize: SIZES.title,
     fontWeight: '800',
     color: COLORS.text,
-    marginBottom: 4,
+    letterSpacing: 0.3,
   },
   subtitle: {
     fontSize: SIZES.sm,
     color: COLORS.textSecondary,
+    marginTop: 4,
   },
   searchContainer: {
     paddingHorizontal: SIZES.padding,
-    paddingBottom: 8,
+    paddingVertical: 10,
+  },
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radiusFull,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.small,
+  },
+  searchIcon: {
+    fontSize: 18,
+    color: COLORS.textLight,
+    marginRight: 8,
   },
   searchInput: {
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: SIZES.radiusFull,
+    flex: 1,
+    paddingVertical: 12,
     fontSize: SIZES.md,
     color: COLORS.text,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   clearBtn: {
-    position: 'absolute',
-    right: 28,
-    top: 10,
     padding: 4,
   },
   clearText: { fontSize: 16, color: COLORS.textLight },
   categoriesContainer: {
-    marginVertical: 12,
+    marginVertical: 8,
   },
   categoriesList: {
     paddingHorizontal: SIZES.padding,
     gap: 8,
+  },
+  categoryChipWrap: {
+    borderRadius: SIZES.radiusFull,
+    overflow: 'hidden',
   },
   categoryChip: {
     flexDirection: 'row',
@@ -260,39 +244,66 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: SIZES.radiusFull,
     backgroundColor: COLORS.surface,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   categoryIcon: {
-    fontSize: 16,
+    fontSize: 14,
     marginRight: 6,
+    color: COLORS.textSecondary,
+  },
+  categoryIconActive: {
+    fontSize: 14,
+    marginRight: 6,
+    color: '#fff',
   },
   categoryText: {
     fontSize: SIZES.sm,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.textSecondary,
+  },
+  categoryTextActive: {
+    fontSize: SIZES.sm,
+    fontWeight: '700',
+    color: '#fff',
   },
   posesList: {
     paddingHorizontal: SIZES.padding,
     paddingBottom: 20,
+    paddingTop: 8,
   },
   poseCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
-    padding: 12,
+    padding: 14,
     marginBottom: 10,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    overflow: 'hidden',
+    ...SHADOWS.card,
   },
-  poseAnimation: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  poseAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    backgroundColor: COLORS.primaryGlow,
+    borderRadius: 2,
+  },
+  poseIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 8,
   },
   poseEmoji: {
-    fontSize: 28,
+    fontSize: 24,
+    color: COLORS.primaryGlow,
   },
   poseInfo: {
     flex: 1,
@@ -317,29 +328,25 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontSize: SIZES.xs,
-    color: COLORS.primary,
+    color: COLORS.primaryGlow,
     fontWeight: '600',
   },
   duration: {
     fontSize: SIZES.xs,
     color: COLORS.textSecondary,
   },
-  arrow: {
-    fontSize: 24,
-    color: COLORS.textLight,
-    fontWeight: '300',
-  },
   favBtn: {
     padding: 8,
   },
   favIcon: {
     fontSize: 22,
+    color: COLORS.textLight,
   },
   emptyState: {
     alignItems: 'center',
     paddingTop: 60,
   },
-  emptyEmoji: { fontSize: 48, marginBottom: 12 },
+  emptyIcon: { fontSize: 48, color: COLORS.textLight, marginBottom: 12 },
   emptyText: {
     fontSize: SIZES.md,
     color: COLORS.textSecondary,

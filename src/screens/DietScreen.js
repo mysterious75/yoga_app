@@ -3,14 +3,15 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, TextInput, Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { DIET_PLANS } from '../data/dietPlans';
 import { useTranslation } from 'react-i18next';
 
 const PLAN_CARDS = [
-  { id: 'weight_loss_veg', icon: '🥗', color: '#00B894' },
-  { id: 'weight_loss_nonveg', icon: '🍗', color: '#E17055' },
-  { id: 'muscle_gain', icon: '💪', color: '#6C5CE7' },
+  { id: 'weight_loss_veg', icon: '◇', gradient: ['#1B4332', '#52B788'] },
+  { id: 'weight_loss_nonveg', icon: '◇', gradient: ['#8B4513', '#D4A373'] },
+  { id: 'muscle_gain', icon: '◇', gradient: ['#2D1B4E', '#7B2CBF'] },
 ];
 
 export default function DietScreen({ navigation }) {
@@ -32,7 +33,6 @@ export default function DietScreen({ navigation }) {
       Alert.alert(isHindi ? 'त्रुटि' : 'Error', isHindi ? 'सभी फ़ील्ड भरें' : 'Fill all fields');
       return;
     }
-    // Mifflin-St Jeor equation
     let bmr = calcGender === 'male'
       ? (10 * w) + (6.25 * h) - (5 * a) + 5
       : (10 * w) + (6.25 * h) - (5 * a) - 161;
@@ -54,7 +54,7 @@ export default function DietScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.title}>{isHindi ? '🍽️ आहार योजनाएं' : '🍽️ Diet Plans'}</Text>
+          <Text style={styles.title}>{isHindi ? '◇ आहार योजनाएं' : '◇ Diet Plans'}</Text>
           <Text style={styles.subtitle}>{isHindi ? 'प्रमाणित पोषण दिशानिर्देशों पर आधारित' : 'Based on certified nutrition guidelines'}</Text>
         </View>
 
@@ -63,12 +63,22 @@ export default function DietScreen({ navigation }) {
           style={styles.calcCard}
           onPress={() => setShowCalc(!showCalc)}
         >
-          <Text style={styles.calcIcon}>🔢</Text>
-          <View style={styles.calcInfo}>
-            <Text style={styles.calcTitle}>{isHindi ? 'कैलोरी कैलकुलेटर' : 'Calorie Calculator'}</Text>
-            <Text style={styles.calcDesc}>{isHindi ? 'अपनी दैनिक कैलोरी ज़रूरत जानें' : 'Know your daily calorie needs'}</Text>
-          </View>
-          <Text style={styles.arrow}>{showCalc ? '▲' : '▼'}</Text>
+          <LinearGradient
+            colors={['rgba(76,201,240,0.15)', 'rgba(26,26,46,0.8)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.calcGradient}
+          >
+            <View style={styles.calcAccent} />
+            <View style={styles.calcInner}>
+              <Text style={styles.calcIcon}>◈</Text>
+              <View style={styles.calcInfo}>
+                <Text style={styles.calcTitle}>{isHindi ? 'कैलोरी कैलकुलेटर' : 'Calorie Calculator'}</Text>
+                <Text style={styles.calcDesc}>{isHindi ? 'अपनी दैनिक कैलोरी ज़रूरत जानें' : 'Know your daily calorie needs'}</Text>
+              </View>
+              <Text style={styles.arrowIcon}>{showCalc ? '▴' : '▾'}</Text>
+            </View>
+          </LinearGradient>
         </TouchableOpacity>
 
         {showCalc && (
@@ -134,22 +144,22 @@ export default function DietScreen({ navigation }) {
 
             {/* Activity Level */}
             <Text style={[styles.calcLabel, { marginBottom: 8, marginHorizontal: SIZES.padding }]}>
-              {isHindi ? '🏃 गतिविधि स्तर' : '🏃 Activity Level'}
+              {isHindi ? '● गतिविधि स्तर' : '● Activity Level'}
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activityRow}>
               {[
-                { id: 'sedentary', en: 'Sedentary', hi: 'कम', icon: '🪑' },
-                { id: 'light', en: 'Light', hi: 'हल्का', icon: '🚶' },
-                { id: 'moderate', en: 'Moderate', hi: 'मध्यम', icon: '🏃' },
-                { id: 'active', en: 'Active', hi: 'सक्रिय', icon: '💪' },
-                { id: 'very_active', en: 'Very Active',hi: 'बहुत सक्रिय', icon: '🔥' },
+                { id: 'sedentary', en: 'Sedentary', hi: 'कम', icon: '○' },
+                { id: 'light', en: 'Light', hi: 'हल्का', icon: '◎' },
+                { id: 'moderate', en: 'Moderate', hi: 'मध्यम', icon: '◉' },
+                { id: 'active', en: 'Active', hi: 'सक्रिय', icon: '●' },
+                { id: 'very_active', en: 'Very Active',hi: 'बहुत सक्रिय', icon: '⬤' },
               ].map(level => (
                 <TouchableOpacity
                   key={level.id}
                   style={[styles.activityChip, calcActivity === level.id && styles.activityChipActive]}
                   onPress={() => setCalcActivity(level.id)}
                 >
-                  <Text style={styles.activityIcon}>{level.icon}</Text>
+                  <Text style={[styles.activityIcon, calcActivity === level.id && { color: '#fff' }]}>{level.icon}</Text>
                   <Text style={[styles.activityText, calcActivity === level.id && { color: '#fff' }]}>
                     {isHindi ? level.hi : level.en}
                   </Text>
@@ -158,25 +168,30 @@ export default function DietScreen({ navigation }) {
             </ScrollView>
 
             <TouchableOpacity style={styles.calcSubmitBtn} onPress={calculateCalories}>
-              <Text style={styles.calcSubmitText}>
-                {isHindi ? '🔢 गणना करें' : '🔢 Calculate'}
-              </Text>
+              <LinearGradient
+                colors={['#16213E', '#4CC9F0']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.calcSubmitGradient}
+              >
+                <Text style={styles.calcSubmitText}>
+                  {isHindi ? '◈ गणना करें' : '◈ Calculate'}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             {calcResult && (
               <View style={styles.calcResult}>
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>{isHindi ? '🔄 मेंटेनेंस' : '🔄 Maintenance'}</Text>
-                  <Text style={styles.resultValue}>{calcResult.tdee} {isHindi ? 'कैलोरी' : 'cal'}</Text>
-                </View>
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>{isHindi ? '📉 वज़न घटाएं' : '📉 Lose Weight'}</Text>
-                  <Text style={[styles.resultValue, { color: COLORS.success }]}>{calcResult.loseWeight} {isHindi ? 'कैलोरी' : 'cal'}</Text>
-                </View>
-                <View style={styles.resultRow}>
-                  <Text style={styles.resultLabel}>{isHindi ? '📈 वज़न बढ़ाएं' : '📈 Gain Weight'}</Text>
-                  <Text style={[styles.resultValue, { color: COLORS.primary }]}>{calcResult.gainWeight} {isHindi ? 'कैलोरी' : 'cal'}</Text>
-                </View>
+                {[
+                  { label: isHindi ? '🔄 मेंटेनेंस' : '🔄 Maintenance', value: `${calcResult.tdee} ${isHindi ? 'कैलोरी' : 'cal'}`, color: COLORS.text },
+                  { label: isHindi ? '▾ वज़न घटाएं' : '▾ Lose Weight', value: `${calcResult.loseWeight} ${isHindi ? 'कैलोरी' : 'cal'}`, color: COLORS.success },
+                  { label: isHindi ? '▴ वज़न बढ़ाएं' : '▴ Gain Weight', value: `${calcResult.gainWeight} ${isHindi ? 'कैलोरी' : 'cal'}`, color: COLORS.accent },
+                ].map((r, i) => (
+                  <View key={i} style={styles.resultRow}>
+                    <Text style={styles.resultLabel}>{r.label}</Text>
+                    <Text style={[styles.resultValue, { color: r.color }]}>{r.value}</Text>
+                  </View>
+                ))}
               </View>
             )}
           </View>
@@ -193,36 +208,46 @@ export default function DietScreen({ navigation }) {
               onPress={() => navigation.navigate('DietPlanDetail', { planId: card.id })}
               activeOpacity={0.85}
             >
-              <View style={[styles.planIconWrap, { backgroundColor: card.color + '15' }]}>
+              <LinearGradient
+                colors={card.gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.planIconWrap}
+              >
                 <Text style={styles.planIcon}>{card.icon}</Text>
-              </View>
+              </LinearGradient>
               <View style={styles.planInfo}>
                 <Text style={styles.planName}>{isHindi ? plan.nameHi : plan.name}</Text>
                 <Text style={styles.planDesc}>{isHindi ? plan.descriptionHi : plan.description}</Text>
                 <View style={styles.planMeta}>
-                  <Text style={styles.planCalories}>🔥 {plan.calories} {isHindi ? 'कैलोरी/दिन' : 'cal/day'}</Text>
-                  <Text style={styles.planDays}>📅 7 {isHindi ? 'दिन' : 'days'}</Text>
+                  <Text style={styles.planCalories}>⬡ {plan.calories} {isHindi ? 'कैलोरी/दिन' : 'cal/day'}</Text>
+                  <Text style={styles.planDays}>⊞ 7 {isHindi ? 'दिन' : 'days'}</Text>
                 </View>
               </View>
-              <Text style={styles.arrow}>›</Text>
+              <Text style={styles.arrowIcon}>›</Text>
             </TouchableOpacity>
           );
         })}
 
         {/* Nutrition Tips */}
-        <Text style={styles.sectionTitle}>{isHindi ? '💡 पोषण टिप्स' : '💡 Nutrition Tips'}</Text>
-        {[
-          { icon: '💧', en: 'Drink 3-4 liters of water daily', hi: 'रोज़ 3-4 लीटर पानी पिएं' },
-          { icon: '🕐', en: 'Eat at regular intervals (every 3-4 hours)', hi: 'नियमित अंतराल पर खाएं (हर 3-4 घंटे)' },
-          { icon: '🥗', en: 'Include salad in every meal', hi: 'हर भोजन में सलाद शामिल करें' },
-          { icon: '🚫', en: 'Avoid processed and packaged food', hi: 'प्रोसेस्ड और पैकेज्ड फूड से बचें' },
-          { icon: '🌙', en: 'Don\'t eat after 8 PM', hi: 'रात 8 बजे के बाद न खाएं' },
-        ].map((tip, index) => (
-          <View key={index} style={styles.tipRow}>
-            <Text style={styles.tipIcon}>{tip.icon}</Text>
-            <Text style={styles.tipText}>{isHindi ? tip.hi : tip.en}</Text>
-          </View>
-        ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{isHindi ? '◈ पोषण टिप्स' : '◈ Nutrition Tips'}</Text>
+          <View style={styles.sectionDivider} />
+          {[
+            { icon: '◉', en: 'Drink 3-4 liters of water daily', hi: 'रोज़ 3-4 लीटर पानी पिएं' },
+            { icon: '⏱', en: 'Eat at regular intervals (every 3-4 hours)', hi: 'नियमित अंतराल पर खाएं (हर 3-4 घंटे)' },
+            { icon: '◇', en: 'Include salad in every meal', hi: 'हर भोजन में सलाद शामिल करें' },
+            { icon: '✕', en: 'Avoid processed and packaged food', hi: 'प्रोसेस्ड और पैकेज्ड फूड से बचें' },
+            { icon: '☽', en: 'Don\'t eat after 8 PM', hi: 'रात 8 बजे के बाद न खाएं' },
+          ].map((tip, index) => (
+            <View key={index} style={styles.tipRow}>
+              <View style={styles.tipIconWrap}>
+                <Text style={styles.tipIcon}>{tip.icon}</Text>
+              </View>
+              <Text style={styles.tipText}>{isHindi ? tip.hi : tip.en}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={{ height: 30 }} />
       </ScrollView>
@@ -236,28 +261,41 @@ const styles = StyleSheet.create({
   title: { fontSize: SIZES.title, fontWeight: '800', color: COLORS.text },
   subtitle: { fontSize: SIZES.sm, color: COLORS.textSecondary, marginTop: 4 },
   calcCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.info + '10',
     marginHorizontal: SIZES.padding,
     marginTop: 16,
-    padding: 14,
     borderRadius: SIZES.radius,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.info,
+    overflow: 'hidden',
+    ...SHADOWS.card,
   },
-  calcIcon: { fontSize: 28, marginRight: 12 },
+  calcGradient: {
+    flexDirection: 'row',
+    borderRadius: SIZES.radius,
+    overflow: 'hidden',
+  },
+  calcAccent: {
+    width: 4,
+    backgroundColor: COLORS.info,
+  },
+  calcInner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+  },
+  calcIcon: { fontSize: 28, color: COLORS.info, marginRight: 12 },
   calcInfo: { flex: 1 },
   calcTitle: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text },
   calcDesc: { fontSize: SIZES.xs, color: COLORS.textSecondary },
-  arrow: { fontSize: 14, color: COLORS.info, marginLeft: 8 },
+  arrowIcon: { fontSize: 14, color: COLORS.info, marginLeft: 8 },
   calcForm: {
     marginHorizontal: SIZES.padding,
     marginTop: 10,
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
     paddingVertical: 14,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   calcRow: {
     flexDirection: 'row',
@@ -268,24 +306,24 @@ const styles = StyleSheet.create({
   calcField: { flex: 1 },
   calcLabel: { fontSize: SIZES.sm, color: COLORS.textSecondary, marginBottom: 6 },
   calcInput: {
-    backgroundColor: COLORS.surfaceAlt,
+    backgroundColor: COLORS.backgroundAlt,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: SIZES.radius,
     fontSize: SIZES.md,
     color: COLORS.text,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.surfaceBorder,
   },
   genderRow: { flexDirection: 'row', gap: 8 },
   genderBtn: {
     flex: 1,
     paddingVertical: 8,
     borderRadius: SIZES.radius,
-    backgroundColor: COLORS.surfaceAlt,
+    backgroundColor: COLORS.backgroundAlt,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.surfaceBorder,
   },
   genderBtnActive: {
     backgroundColor: COLORS.primary,
@@ -303,37 +341,42 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: SIZES.radiusFull,
-    backgroundColor: COLORS.surfaceAlt,
+    backgroundColor: COLORS.backgroundAlt,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.surfaceBorder,
   },
   activityChipActive: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   },
-  activityIcon: { fontSize: 14, marginRight: 4 },
+  activityIcon: { fontSize: 12, marginRight: 4, color: COLORS.textSecondary },
   activityText: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.text },
   calcSubmitBtn: {
-    backgroundColor: COLORS.info,
     marginHorizontal: SIZES.padding,
-    paddingVertical: 12,
     borderRadius: SIZES.radius,
+    overflow: 'hidden',
+  },
+  calcSubmitGradient: {
+    paddingVertical: 14,
     alignItems: 'center',
+    borderRadius: SIZES.radius,
   },
   calcSubmitText: { fontSize: SIZES.md, fontWeight: '700', color: '#fff' },
   calcResult: {
     marginHorizontal: SIZES.padding,
     marginTop: 12,
     padding: 14,
-    backgroundColor: COLORS.surfaceAlt,
+    backgroundColor: COLORS.backgroundAlt,
     borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   resultRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 6,
   },
-  resultLabel: { fontSize: SIZES.md, color: COLORS.text },
+  resultLabel: { fontSize: SIZES.md, color: COLORS.textSecondary },
   resultValue: { fontSize: SIZES.md, fontWeight: '700', color: COLORS.text },
   planCard: {
     flexDirection: 'row',
@@ -342,41 +385,61 @@ const styles = StyleSheet.create({
     marginHorizontal: SIZES.padding,
     marginTop: 14,
     padding: 16,
-    borderRadius: SIZES.radius,
-    ...SHADOWS.medium,
+    borderRadius: SIZES.radiusLg,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    ...SHADOWS.card,
   },
   planIconWrap: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  planIcon: { fontSize: 28 },
-  planInfo: { flex: 1, marginLeft: 12 },
+  planIcon: { fontSize: 28, color: '#fff' },
+  planInfo: { flex: 1, marginLeft: 14 },
   planName: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text },
   planDesc: { fontSize: SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   planMeta: { flexDirection: 'row', marginTop: 6, gap: 12 },
-  planCalories: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.primary },
+  planCalories: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.accent },
   planDays: { fontSize: SIZES.xs, color: COLORS.textSecondary },
-  arrow: { fontSize: 24, color: COLORS.textLight },
+  section: {
+    marginTop: 28,
+    paddingHorizontal: SIZES.padding,
+  },
   sectionTitle: {
     fontSize: SIZES.lg,
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.text,
-    marginHorizontal: SIZES.padding,
-    marginTop: 24,
-    marginBottom: 10,
+  },
+  sectionDivider: {
+    width: 32,
+    height: 3,
+    backgroundColor: COLORS.accent,
+    borderRadius: 2,
+    marginTop: 8,
+    marginBottom: 14,
   },
   tipRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: SIZES.padding,
     marginBottom: 10,
     backgroundColor: COLORS.surface,
-    padding: 12,
+    padding: 14,
     borderRadius: SIZES.radius,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
-  tipIcon: { fontSize: 20, marginRight: 12 },
+  tipIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: COLORS.primaryDark + '40',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  tipIcon: { fontSize: 16, color: COLORS.primaryGlow },
   tipText: { flex: 1, fontSize: SIZES.md, color: COLORS.text },
 });

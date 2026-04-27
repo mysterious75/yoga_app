@@ -3,27 +3,28 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, Dimensions, Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 const FREE_FEATURES = [
-  { icon: '🧘', en: '5 yoga poses per day', hi: 'दिन में 5 योग आसन' },
-  { icon: '🍽️', en: 'Basic diet plans', hi: 'बेसिक डाइट प्लान' },
-  { icon: '📊', en: 'BMI calculator', hi: 'BMI कैलकुलेटर' },
-  { icon: '💧', en: 'Water tracker', hi: 'पानी ट्रैकर' },
+  { icon: '◎', en: '5 yoga poses per day', hi: 'दिन में 5 योग आसन' },
+  { icon: '◇', en: 'Basic diet plans', hi: 'बेसिक डाइट प्लान' },
+  { icon: '◈', en: 'BMI calculator', hi: 'BMI कैलकुलेटर' },
+  { icon: '◉', en: 'Water tracker', hi: 'पानी ट्रैकर' },
 ];
 
 const PREMIUM_FEATURES = [
-  { icon: '🧘', en: '100+ yoga poses with animations', hi: '100+ योग आसन एनिमेशन के साथ' },
-  { icon: '🍽️', en: 'All 7-day diet plans (Veg + Non-Veg)', hi: 'सभी 7-दिन डाइट प्लान (शाकाहारी + मांसाहारी)' },
-  { icon: '🩺', en: 'Full pain relief guides', hi: 'पूर्ण दर्द राहत गाइड' },
-  { icon: '🍎', en: 'Complete food database (80+ foods)', hi: 'पूर्ण फ़ूड डेटाबेस (80+ भोजन)' },
-  { icon: '📊', en: 'Advanced health tracking', hi: 'उन्नत स्वास्थ्य ट्रैकिंग' },
-  { icon: '📈', en: 'Weekly & monthly reports', hi: 'साप्ताहिक और मासिक रिपोर्ट' },
-  { icon: '🎯', en: 'Personalized goals', hi: 'व्यक्तिगत लक्ष्य' },
-  { icon: '🚫', en: 'No ads', hi: 'कोई विज्ञापन नहीं' },
+  { icon: '◎', en: '100+ yoga poses with animations', hi: '100+ योग आसन एनिमेशन के साथ' },
+  { icon: '◇', en: 'All 7-day diet plans (Veg + Non-Veg)', hi: 'सभी 7-दिन डाइट प्लान (शाकाहारी + मांसाहारी)' },
+  { icon: '✚', en: 'Full pain relief guides', hi: 'पूर्ण दर्द राहत गाइड' },
+  { icon: '⬡', en: 'Complete food database (80+ foods)', hi: 'पूर्ण फ़ूड डेटाबेस (80+ भोजन)' },
+  { icon: '◈', en: 'Advanced health tracking', hi: 'उन्नत स्वास्थ्य ट्रैकिंग' },
+  { icon: '▤', en: 'Weekly & monthly reports', hi: 'साप्ताहिक और मासिक रिपोर्ट' },
+  { icon: '◉', en: 'Personalized goals', hi: 'व्यक्तिगत लक्ष्य' },
+  { icon: '✕', en: 'No ads', hi: 'कोई विज्ञापन नहीं' },
 ];
 
 const PLANS = [
@@ -84,14 +85,26 @@ export default function SubscriptionScreen({ navigation }) {
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>
-            {isHindi ? '⭐ प्रीमियम' : '⭐ Premium'}
+            {isHindi ? '★ प्रीमियम' : '★ Premium'}
           </Text>
           <View style={{ width: 40 }} />
         </View>
 
         {/* Hero Section */}
-        <View style={styles.hero}>
-          <Text style={styles.heroEmoji}>🏆</Text>
+        <LinearGradient
+          colors={['#0A0A0A', '#1B4332', '#0A0A0A']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          <View style={styles.heroIconWrap}>
+            <LinearGradient
+              colors={['#D4A373', '#E9C46A']}
+              style={styles.heroIconGradient}
+            >
+              <Text style={styles.heroEmoji}>★</Text>
+            </LinearGradient>
+          </View>
           <Text style={styles.heroTitle}>
             {isHindi ? 'YogaFit Pro प्रीमियम' : 'YogaFit Pro Premium'}
           </Text>
@@ -100,7 +113,7 @@ export default function SubscriptionScreen({ navigation }) {
               ? 'सभी सुविधाएं अनलॉक करें और अपनी स्वास्थ्य यात्रा तेज़ करें'
               : 'Unlock all features & accelerate your health journey'}
           </Text>
-        </View>
+        </LinearGradient>
 
         {/* Free vs Premium */}
         <View style={styles.comparisonSection}>
@@ -128,14 +141,17 @@ export default function SubscriptionScreen({ navigation }) {
 
           {/* Premium Column */}
           <View style={[styles.comparisonCard, styles.premiumCard]}>
-            <View style={[styles.comparisonHeader, styles.premiumHeader]}>
+            <LinearGradient
+              colors={[COLORS.primaryDark, COLORS.primary]}
+              style={styles.premiumHeader}
+            >
               <Text style={[styles.comparisonLabel, { color: '#fff' }]}>
-                {isHindi ? '⭐ प्रीमियम' : '⭐ Premium'}
+                {isHindi ? '★ प्रीमियम' : '★ Premium'}
               </Text>
-            </View>
+            </LinearGradient>
             {PREMIUM_FEATURES.map((feature, index) => (
               <View key={index} style={styles.featureRow}>
-                <Text style={styles.featureIcon}>{feature.icon}</Text>
+                <Text style={[styles.featureIcon, { color: COLORS.accent }]}>{feature.icon}</Text>
                 <Text style={[styles.featureText, { color: COLORS.text }]}>
                   {isHindi ? feature.hi : feature.en}
                 </Text>
@@ -162,11 +178,14 @@ export default function SubscriptionScreen({ navigation }) {
               activeOpacity={0.7}
             >
               {plan.badge && (
-                <View style={styles.planBadge}>
+                <LinearGradient
+                  colors={[COLORS.primaryDark, COLORS.primary]}
+                  style={styles.planBadge}
+                >
                   <Text style={styles.planBadgeText}>
                     {isHindi ? plan.badgeHi : plan.badgeEn}
                   </Text>
-                </View>
+                </LinearGradient>
               )}
               <View style={styles.planContent}>
                 <View>
@@ -188,7 +207,12 @@ export default function SubscriptionScreen({ navigation }) {
                   styles.radioOuter,
                   selectedPlan === plan.id && styles.radioOuterSelected,
                 ]}>
-                  {selectedPlan === plan.id && <View style={styles.radioInner} />}
+                  {selectedPlan === plan.id && (
+                    <LinearGradient
+                      colors={[COLORS.primaryDark, COLORS.primary]}
+                      style={styles.radioInner}
+                    />
+                  )}
                 </View>
               </View>
             </TouchableOpacity>
@@ -196,10 +220,17 @@ export default function SubscriptionScreen({ navigation }) {
         </View>
 
         {/* Subscribe Button */}
-        <TouchableOpacity style={styles.subscribeBtn} onPress={handleSubscribe}>
-          <Text style={styles.subscribeText}>
-            {isHindi ? 'अभी सब्सक्राइब करें' : 'Subscribe Now'}
-          </Text>
+        <TouchableOpacity style={styles.subscribeBtnWrap} onPress={handleSubscribe}>
+          <LinearGradient
+            colors={[COLORS.primaryDark, COLORS.primary, COLORS.primaryLight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.subscribeBtn}
+          >
+            <Text style={styles.subscribeText}>
+              {isHindi ? 'अभी सब्सक्राइब करें' : 'Subscribe Now'}
+            </Text>
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Restore */}
@@ -211,7 +242,7 @@ export default function SubscriptionScreen({ navigation }) {
 
         {/* Testimonial */}
         <View style={styles.testimonial}>
-          <Text style={styles.testimonialStars}>⭐⭐⭐⭐⭐</Text>
+          <Text style={styles.testimonialStars}>★ ★ ★ ★ ★</Text>
           <Text style={styles.testimonialText}>
             {isHindi
               ? '"यह ऐप मेरी ज़िंदगी बदल दी! 3 महीने में 10 kg वज़न कम किया।"'
@@ -246,17 +277,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: SIZES.padding,
     paddingVertical: 12,
     backgroundColor: COLORS.surface,
-    ...SHADOWS.small,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   backBtn: { padding: 8 },
   backText: { fontSize: 28, color: COLORS.text },
-  headerTitle: { fontSize: SIZES.lg, fontWeight: '700', color: COLORS.text },
+  headerTitle: { fontSize: SIZES.lg, fontWeight: '700', color: COLORS.accent },
   hero: {
     alignItems: 'center',
-    paddingVertical: 30,
-    backgroundColor: COLORS.primary + '08',
+    paddingVertical: 36,
+    paddingHorizontal: SIZES.padding,
   },
-  heroEmoji: { fontSize: 60, marginBottom: 12 },
+  heroIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    overflow: 'hidden',
+    marginBottom: 16,
+    ...SHADOWS.glowGold,
+  },
+  heroIconGradient: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroEmoji: { fontSize: 36, color: '#fff' },
   heroTitle: {
     fontSize: SIZES.xxl,
     fontWeight: '800',
@@ -268,12 +314,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: 8,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     lineHeight: 22,
   },
   comparisonSection: {
     paddingHorizontal: SIZES.padding,
-    marginTop: 10,
+    marginTop: 20,
   },
   sectionTitle: {
     fontSize: SIZES.lg,
@@ -284,21 +330,26 @@ const styles = StyleSheet.create({
   comparisonCard: {
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
-    marginBottom: 12,
+    marginBottom: 14,
     overflow: 'hidden',
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   premiumCard: {
-    borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderWidth: 1,
+    borderColor: COLORS.primaryGlow,
   },
   comparisonHeader: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: COLORS.surfaceAlt,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   premiumHeader: {
-    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
   comparisonLabel: {
     fontSize: SIZES.base,
@@ -309,11 +360,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
-  featureIcon: { fontSize: 18, marginRight: 12 },
+  featureIcon: { fontSize: 16, marginRight: 12, color: COLORS.textSecondary, width: 20, textAlign: 'center' },
   featureText: { flex: 1, fontSize: SIZES.sm, color: COLORS.textSecondary },
   checkIcon: { fontSize: 16, fontWeight: '700', color: COLORS.success },
   plansSection: {
@@ -323,21 +374,20 @@ const styles = StyleSheet.create({
   planCard: {
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
-    padding: 16,
+    padding: 18,
     marginBottom: 12,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: COLORS.border,
-    ...SHADOWS.small,
+    ...SHADOWS.card,
   },
   planCardSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '05',
+    borderColor: COLORS.primaryGlow,
+    backgroundColor: COLORS.surfaceElevated,
   },
   planBadge: {
     position: 'absolute',
     top: -1,
     right: 16,
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderBottomLeftRadius: 8,
@@ -364,7 +414,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   saveTag: {
-    backgroundColor: COLORS.accent + '15',
+    backgroundColor: COLORS.accent + '20',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: SIZES.radiusFull,
@@ -384,22 +434,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioOuterSelected: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.primaryGlow,
   },
   radioInner: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: COLORS.primary,
   },
-  subscribeBtn: {
-    backgroundColor: COLORS.primary,
+  subscribeBtnWrap: {
     marginHorizontal: SIZES.padding,
     marginTop: 24,
-    paddingVertical: 16,
     borderRadius: SIZES.radiusLg,
+    overflow: 'hidden',
+    ...SHADOWS.glow,
+  },
+  subscribeBtn: {
+    paddingVertical: 18,
     alignItems: 'center',
-    ...SHADOWS.medium,
+    borderRadius: SIZES.radiusLg,
   },
   subscribeText: {
     fontSize: SIZES.lg,
@@ -408,22 +460,24 @@ const styles = StyleSheet.create({
   },
   restoreBtn: {
     alignItems: 'center',
-    marginTop: 14,
+    marginTop: 16,
   },
   restoreText: {
     fontSize: SIZES.md,
-    color: COLORS.primary,
+    color: COLORS.primaryGlow,
     fontWeight: '600',
   },
   testimonial: {
     marginHorizontal: SIZES.padding,
     marginTop: 24,
-    padding: 16,
+    padding: 18,
     backgroundColor: COLORS.surface,
     borderRadius: SIZES.radius,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
-  testimonialStars: { fontSize: 14, marginBottom: 8 },
+  testimonialStars: { fontSize: 14, marginBottom: 10, color: COLORS.accent, letterSpacing: 4 },
   testimonialText: {
     fontSize: SIZES.md,
     color: COLORS.text,
@@ -433,7 +487,7 @@ const styles = StyleSheet.create({
   testimonialAuthor: {
     fontSize: SIZES.sm,
     color: COLORS.textSecondary,
-    marginTop: 8,
+    marginTop: 10,
     fontWeight: '600',
   },
   disclaimer: {

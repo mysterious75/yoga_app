@@ -1,31 +1,19 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, Linking,
+  SafeAreaView,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
 import { YOGA_POSES } from '../data/yogaPoses';
 import { FOOD_DATABASE } from '../data/foodDatabase';
 
-// Pain-specific recommendations
 const PAIN_DATA = {
   back: {
     redFlags: {
-      en: [
-        'Pain radiating down legs',
-        'Numbness or tingling in legs',
-        'Loss of bladder control',
-        'Pain after injury/accident',
-        'Pain lasting more than 4 weeks',
-      ],
-      hi: [
-        'पैरों तक दर्द फैलना',
-        'पैरों में सुन्नपन झनझनाहट',
-        'मूत्राशय पर नियंत्रण खोना',
-        'चोट/दुर्घटना के बाद दर्द',
-        '4 हफ्ते से ज़्यादा दर्द',
-      ],
+      en: ['Pain radiating down legs', 'Numbness or tingling in legs', 'Loss of bladder control', 'Pain after injury/accident', 'Pain lasting more than 4 weeks'],
+      hi: ['पैरों तक दर्द फैलना', 'पैरों में सुन्नपन झनझनाहट', 'मूत्राशय पर नियंत्रण खोना', 'चोट/दुर्घटना के बाद दर्द', '4 हफ्ते से ज़्यादा दर्द'],
     },
     poseIds: ['bhujangasana', 'marjaryasana', 'balasana', 'setu_bandhasana', 'adho_mukha', 'salabhasana', 'kati_chakrasana'],
     foodTags: ['anti_inflammatory', 'calcium', 'vitamin_d'],
@@ -50,20 +38,8 @@ const PAIN_DATA = {
   },
   knee: {
     redFlags: {
-      en: [
-        'Knee locking or giving way',
-        'Visible swelling that won\'t go down',
-        'Cannot bear weight at all',
-        'Deformity after injury',
-        'Fever with knee pain',
-      ],
-      hi: [
-        'घुटना लॉक होना या मुड़ना',
-        'सूजन जो कम न हो',
-        'वज़न बिल्कुल न उठा पाना',
-        'चोट के बाद विकृति',
-        'बुखार के साथ घुटने में दर्द',
-      ],
+      en: ['Knee locking or giving way', 'Visible swelling that won\'t go down', 'Cannot bear weight at all', 'Deformity after injury', 'Fever with knee pain'],
+      hi: ['घुटना लॉक होना या मुड़ना', 'सूजन जो कम न हो', 'वज़न बिल्कुल न उठा पाना', 'चोट के बाद विकृति', 'बुखार के साथ घुटने में दर्द'],
     },
     poseIds: ['virabhadrasana', 'vriksasana', 'utkatasana', 'malasana', 'supta_vajrasana'],
     foodTags: ['calcium', 'collagen', 'omega3'],
@@ -88,20 +64,8 @@ const PAIN_DATA = {
   },
   neck: {
     redFlags: {
-      en: [
-        'Pain radiating to arms/hands',
-        'Weakness in arms or hands',
-        'Dizziness or fainting',
-        'Neck stiffness with fever',
-        'Cannot look down to chest',
-      ],
-      hi: [
-        'हाथों/बाजुओं में दर्द फैलना',
-        'हाथों में कमज़ोरी',
-        'चक्कर आना या बेहोशी',
-        'बुखार के साथ गर्दन अकड़ना',
-        'छाती की तरफ देख न पाना',
-      ],
+      en: ['Pain radiating to arms/hands', 'Weakness in arms or hands', 'Dizziness or fainting', 'Neck stiffness with fever', 'Cannot look down to chest'],
+      hi: ['हाथों/बाजुओं में दर्द फैलना', 'हाथों में कमज़ोरी', 'चक्कर आना या बेहोशी', 'बुखार के साथ गर्दन अकड़ना', 'छाती की तरफ देख न पाना'],
     },
     poseIds: ['marjaryasana', 'balasana', 'setu_bandhasana', 'ardha_matsyendrasana', 'viparita_karani'],
     foodTags: ['anti_inflammatory', 'magnesium', 'omega3'],
@@ -126,20 +90,8 @@ const PAIN_DATA = {
   },
   headache: {
     redFlags: {
-      en: [
-        'Sudden worst headache of life',
-        'Headache with fever and stiff neck',
-        'Vision changes or confusion',
-        'Headache after head injury',
-        'Headache with seizures',
-      ],
-      hi: [
-        'अचानक ज़िंदगी का सबसे बुरा सिरदर्द',
-        'बुखार और गर्दन अकड़न के साथ सिरदर्द',
-        'देखने में बदलाव या भ्रम',
-        'सिर की चोट के बाद सिरदर्द',
-        'दौरे के साथ सिरदर्द',
-      ],
+      en: ['Sudden worst headache of life', 'Headache with fever and stiff neck', 'Vision changes or confusion', 'Headache after head injury', 'Headache with seizures'],
+      hi: ['अचानक ज़िंदगी का सबसे बुरा सिरदर्द', 'बुखार और गर्दन अकड़न के साथ सिरदर्द', 'देखने में बदलाव या भ्रम', 'सिर की चोट के बाद सिरदर्द', 'दौरे के साथ सिरदर्द'],
     },
     poseIds: ['balasana', 'viparita_karani', 'savasana', 'padmasana', 'uttanasana'],
     foodTags: ['magnesium', 'hydration', 'vitamin_b'],
@@ -164,20 +116,8 @@ const PAIN_DATA = {
   },
   shoulder: {
     redFlags: {
-      en: [
-        'Cannot raise arm at all',
-        'Severe pain at night',
-        'Shoulder appears deformed',
-        'Numbness down the arm',
-        'Pain after a fall',
-      ],
-      hi: [
-        'हाथ बिल्कुल न उठा पाना',
-        'रात को तेज दर्द',
-        'कंधा विकृत दिखना',
-        'बाजू में सुन्नपन',
-        'गिरने के बाद दर्द',
-      ],
+      en: ['Cannot raise arm at all', 'Severe pain at night', 'Shoulder appears deformed', 'Numbness down the arm', 'Pain after a fall'],
+      hi: ['हाथ बिल्कुल न उठा पाना', 'रात को तेज दर्द', 'कंधा विकृत दिखना', 'बाजू में सुन्नपन', 'गिरने के बाद दर्द'],
     },
     poseIds: ['adho_mukha', 'garudasana', 'gomukhasana', 'urdhva_mukha', 'paschimottanasana'],
     foodTags: ['anti_inflammatory', 'protein', 'omega3'],
@@ -202,20 +142,8 @@ const PAIN_DATA = {
   },
   digestion: {
     redFlags: {
-      en: [
-        'Blood in stool',
-        'Unexplained weight loss',
-        'Severe abdominal pain',
-        'Persistent vomiting',
-        'Difficulty swallowing',
-      ],
-      hi: [
-        'मल में खून',
-        'बिना कारण वज़न घटना',
-        'पेट में तेज दर्द',
-        'लगातार उल्टी',
-        'निगलने में कठिनाई',
-      ],
+      en: ['Blood in stool', 'Unexplained weight loss', 'Severe abdominal pain', 'Persistent vomiting', 'Difficulty swallowing'],
+      hi: ['मल में खून', 'बिना कारण वज़न घटना', 'पेट में तेज दर्द', 'लगातार उल्टी', 'निगलने में कठिनाई'],
     },
     poseIds: ['pawanmuktasana', 'balasana', 'ardha_matsyendrasana', 'marjaryasana', 'savasana'],
     foodTags: ['fiber', 'probiotic', 'digestive'],
@@ -240,20 +168,8 @@ const PAIN_DATA = {
   },
   sciatica: {
     redFlags: {
-      en: [
-        'Loss of bladder/bowel control',
-        'Progressive leg weakness',
-        'Numbness in groin area',
-        'Pain not improving after 6 weeks',
-        'Pain after serious injury',
-      ],
-      hi: [
-        'मूत्र/मल पर नियंत्रण खोना',
-        'पैर में बढ़ती कमज़ोरी',
-        'जांघ के पास सुन्नपन',
-        '6 हफ्ते बाद भी दर्द में सुधार नहीं',
-        'गंभीर चोट के बाद दर्द',
-      ],
+      en: ['Loss of bladder/bowel control', 'Progressive leg weakness', 'Numbness in groin area', 'Pain not improving after 6 weeks', 'Pain after serious injury'],
+      hi: ['मूत्र/मल पर नियंत्रण खोना', 'पैर में बढ़ती कमज़ोरी', 'जांघ के पास सुन्नपन', '6 हफ्ते बाद भी दर्द में सुधार नहीं', 'गंभीर चोट के बाद दर्द'],
     },
     poseIds: ['adho_mukha', 'balasana', 'ardha_matsyendrasana', 'setu_bandhasana', 'savasana'],
     foodTags: ['anti_inflammatory', 'omega3', 'vitamin_b'],
@@ -278,20 +194,8 @@ const PAIN_DATA = {
   },
   hip: {
     redFlags: {
-      en: [
-        'Cannot bear weight on hip',
-        'Hip appears shorter/turned',
-        'Severe pain after fall',
-        'Fever with hip pain',
-        'Groin pain with movement',
-      ],
-      hi: [
-        'कूल्हे पर वज़न न डाल पाना',
-        'कूल्हा छोटा/घूमा हुआ दिखना',
-        'गिरने के बाद तेज दर्द',
-        'बुखार के साथ कूल्हे में दर्द',
-        'हिलने पर जांघ में दर्द',
-      ],
+      en: ['Cannot bear weight on hip', 'Hip appears shorter/turned', 'Severe pain after fall', 'Fever with hip pain', 'Groin pain with movement'],
+      hi: ['कूल्हे पर वज़न न डाल पाना', 'कूल्हा छोटा/घूमा हुआ दिखना', 'गिरने के बाद तेज दर्द', 'बुखार के साथ कूल्हे में दर्द', 'हिलने पर जांघ में दर्द'],
     },
     poseIds: ['virabhadrasana', 'malasana', 'anjaneyasana', 'gomukhasana', 'supta_vajrasana'],
     foodTags: ['calcium', 'anti_inflammatory', 'protein'],
@@ -324,12 +228,10 @@ export default function PainDetailScreen({ route, navigation }) {
 
   const data = PAIN_DATA[painArea.id] || PAIN_DATA.back;
 
-  // Get recommended poses from yoga database
   const recommendedPoses = YOGA_POSES.filter(pose =>
     data.poseIds.includes(pose.id)
   ).slice(0, 6);
 
-  // Get recommended foods
   const recommendedFoods = FOOD_DATABASE.filter(food =>
     food.tags && food.tags.some(tag => data.foodTags.includes(tag))
   ).slice(0, 8);
@@ -337,10 +239,17 @@ export default function PainDetailScreen({ route, navigation }) {
   const schedule = isHindi ? data.schedule.hi : data.schedule.en;
   const redFlags = isHindi ? data.redFlags.hi : data.redFlags.en;
 
+  const painColor = painArea.color || COLORS.primary;
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: painArea.color }]}>
+      <LinearGradient
+        colors={[painColor, COLORS.background]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.header}
+      >
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
@@ -352,17 +261,20 @@ export default function PainDetailScreen({ route, navigation }) {
             {isHindi ? painArea.descHi : painArea.descEn}
           </Text>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Red Flags Warning */}
         <View style={styles.redFlagCard}>
-          <Text style={styles.redFlagTitle}>
-            {isHindi ? '⚠️ डॉक्टर के पास जाएं अगर:' : '⚠️ See a Doctor If:'}
-          </Text>
+          <View style={styles.redFlagHeader}>
+            <Text style={styles.redFlagIcon}>⚠</Text>
+            <Text style={styles.redFlagTitle}>
+              {isHindi ? 'डॉक्टर के पास जाएं अगर:' : 'See a Doctor If:'}
+            </Text>
+          </View>
           {redFlags.map((flag, index) => (
             <View key={index} style={styles.redFlagRow}>
-              <Text style={styles.redFlagBullet}>🚨</Text>
+              <View style={[styles.redFlagDot, { backgroundColor: COLORS.error }]} />
               <Text style={styles.redFlagText}>{flag}</Text>
             </View>
           ))}
@@ -371,9 +283,9 @@ export default function PainDetailScreen({ route, navigation }) {
         {/* Tab Buttons */}
         <View style={styles.tabRow}>
           {[
-            { id: 'yoga', icon: '🧘', en: 'Yoga', hi: 'योग' },
-            { id: 'food', icon: '🍎', en: 'Foods', hi: 'भोजन' },
-            { id: 'schedule', icon: '📅', en: 'Schedule', hi: 'समय-सारणी' },
+            { id: 'yoga', icon: '◎', en: 'Yoga', hi: 'योग' },
+            { id: 'food', icon: '⬡', en: 'Foods', hi: 'भोजन' },
+            { id: 'schedule', icon: '▤', en: 'Schedule', hi: 'समय-सारणी' },
           ].map(tab => (
             <TouchableOpacity
               key={tab.id}
@@ -383,6 +295,7 @@ export default function PainDetailScreen({ route, navigation }) {
               <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
                 {tab.icon} {isHindi ? tab.hi : tab.en}
               </Text>
+              {activeTab === tab.id && <View style={[styles.tabIndicator, { backgroundColor: painColor }]} />}
             </TouchableOpacity>
           ))}
         </View>
@@ -391,7 +304,7 @@ export default function PainDetailScreen({ route, navigation }) {
         {activeTab === 'yoga' && (
           <View style={styles.tabContent}>
             <Text style={styles.tabContentTitle}>
-              {isHindi ? '🧘 अनुशंसित योग आसन' : '🧘 Recommended Yoga Poses'}
+              {isHindi ? '◎ अनुशंसित योग आसन' : '◎ Recommended Yoga Poses'}
             </Text>
             {recommendedPoses.length > 0 ? (
               recommendedPoses.map((pose) => (
@@ -400,8 +313,8 @@ export default function PainDetailScreen({ route, navigation }) {
                   style={styles.poseCard}
                   onPress={() => navigation.navigate('YogaDetail', { pose })}
                 >
-                  <View style={[styles.poseIconBg, { backgroundColor: painArea.color + '15' }]}>
-                    <Text style={styles.poseIcon}>🧘</Text>
+                  <View style={[styles.poseIconBg, { backgroundColor: painColor + '20' }]}>
+                    <Text style={[styles.poseIcon, { color: painColor }]}>◎</Text>
                   </View>
                   <View style={styles.poseInfo}>
                     <Text style={styles.poseName}>
@@ -409,8 +322,8 @@ export default function PainDetailScreen({ route, navigation }) {
                     </Text>
                     <Text style={styles.poseSanskrit}>{pose.sanskrit}</Text>
                     <View style={styles.poseMeta}>
-                      <Text style={styles.poseMetaText}>⏱️ {pose.duration}</Text>
-                      <Text style={styles.poseMetaText}>🔥 {pose.caloriesPerMin}/min</Text>
+                      <Text style={styles.poseMetaText}>⏱ {pose.duration}</Text>
+                      <Text style={styles.poseMetaText}>△ {pose.caloriesPerMin}/min</Text>
                     </View>
                   </View>
                   <Text style={styles.arrow}>›</Text>
@@ -428,7 +341,7 @@ export default function PainDetailScreen({ route, navigation }) {
         {activeTab === 'food' && (
           <View style={styles.tabContent}>
             <Text style={styles.tabContentTitle}>
-              {isHindi ? '🍎 अनुशंसित भोजन' : '🍎 Recommended Foods'}
+              {isHindi ? '⬡ अनुशंसित भोजन' : '⬡ Recommended Foods'}
             </Text>
             {recommendedFoods.length > 0 ? (
               recommendedFoods.map((food) => (
@@ -437,7 +350,9 @@ export default function PainDetailScreen({ route, navigation }) {
                   style={styles.foodCard}
                   onPress={() => navigation.navigate('FoodDetail', { food })}
                 >
-                  <Text style={styles.foodIcon}>{food.icon || '🍽️'}</Text>
+                  <View style={[styles.foodIconBg, { backgroundColor: COLORS.accent + '20' }]}>
+                    <Text style={styles.foodIconText}>⬡</Text>
+                  </View>
                   <View style={styles.foodInfo}>
                     <Text style={styles.foodName}>
                       {isHindi ? food.nameHi : food.name}
@@ -464,14 +379,17 @@ export default function PainDetailScreen({ route, navigation }) {
         {activeTab === 'schedule' && (
           <View style={styles.tabContent}>
             <Text style={styles.tabContentTitle}>
-              {isHindi ? '📅 दैनिक समय-सारणी' : '📅 Daily Schedule'}
+              {isHindi ? '▤ दैनिक समय-सारणी' : '▤ Daily Schedule'}
             </Text>
             {schedule.map((item, index) => (
               <View key={index} style={styles.scheduleRow}>
                 <View style={styles.timeColumn}>
-                  <Text style={styles.timeText}>{item.time}</Text>
+                  <Text style={[styles.timeText, { color: painColor }]}>{item.time}</Text>
                 </View>
-                <View style={styles.timelineDot} />
+                <View style={styles.timelineLine}>
+                  <View style={[styles.timelineDot, { backgroundColor: painColor }]} />
+                  {index < schedule.length - 1 && <View style={[styles.timelineConnector, { backgroundColor: COLORS.border }]} />}
+                </View>
                 <View style={styles.taskColumn}>
                   <Text style={styles.taskText}>{item.task}</Text>
                 </View>
@@ -492,100 +410,130 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
-    paddingVertical: 16,
+    paddingVertical: 20,
+    paddingTop: 16,
   },
   backBtn: { padding: 8 },
   backText: { fontSize: 28, color: '#fff' },
   headerInfo: { flex: 1, marginLeft: 8 },
   headerTitle: { fontSize: SIZES.xl, fontWeight: '800', color: '#fff' },
-  headerSubtitle: { fontSize: SIZES.sm, color: '#ffffffcc', marginTop: 2 },
+  headerSubtitle: { fontSize: SIZES.sm, color: '#ffffffaa', marginTop: 2 },
   redFlagCard: {
-    backgroundColor: COLORS.error + '10',
+    backgroundColor: COLORS.surface,
     marginHorizontal: SIZES.padding,
     marginTop: 16,
-    padding: 16,
+    padding: 18,
     borderRadius: SIZES.radius,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
+    borderWidth: 1,
+    borderColor: COLORS.error + '30',
+    ...SHADOWS.card,
   },
+  redFlagHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  redFlagIcon: { fontSize: 18, color: COLORS.error, marginRight: 8 },
   redFlagTitle: {
     fontSize: SIZES.base,
     fontWeight: '700',
     color: COLORS.error,
-    marginBottom: 10,
   },
   redFlagRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  redFlagBullet: { fontSize: 14, marginRight: 8, marginTop: 2 },
+  redFlagDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 7,
+    marginRight: 10,
+  },
   redFlagText: { flex: 1, fontSize: SIZES.sm, color: COLORS.text, lineHeight: 20 },
   tabRow: {
     flexDirection: 'row',
     paddingHorizontal: SIZES.padding,
-    gap: 8,
-    marginTop: 16,
+    gap: 4,
+    marginTop: 20,
   },
   tabBtn: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: SIZES.radiusFull,
-    backgroundColor: COLORS.surface,
+    paddingVertical: 12,
     alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: SIZES.radius,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   tabBtnActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.surfaceElevated,
+    borderColor: COLORS.primaryGlow,
   },
-  tabText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.text },
-  tabTextActive: { color: '#fff' },
+  tabText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.text },
+  tabIndicator: {
+    width: 20,
+    height: 3,
+    borderRadius: 2,
+    marginTop: 6,
+  },
   tabContent: {
-    marginTop: 12,
+    marginTop: 16,
     paddingHorizontal: SIZES.padding,
   },
   tabContentTitle: {
     fontSize: SIZES.base,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   poseCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
-    padding: 14,
+    padding: 16,
     borderRadius: SIZES.radius,
     marginBottom: 10,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   poseIconBg: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   poseIcon: { fontSize: 22 },
-  poseInfo: { flex: 1, marginLeft: 12 },
+  poseInfo: { flex: 1, marginLeft: 14 },
   poseName: { fontSize: SIZES.md, fontWeight: '700', color: COLORS.text },
   poseSanskrit: { fontSize: SIZES.xs, color: COLORS.textSecondary, fontStyle: 'italic', marginTop: 1 },
-  poseMeta: { flexDirection: 'row', gap: 12, marginTop: 4 },
+  poseMeta: { flexDirection: 'row', gap: 14, marginTop: 4 },
   poseMetaText: { fontSize: SIZES.xs, color: COLORS.textSecondary },
   arrow: { fontSize: 24, color: COLORS.textLight, fontWeight: '300' },
   foodCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
-    padding: 14,
+    padding: 16,
     borderRadius: SIZES.radius,
     marginBottom: 10,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
-  foodIcon: { fontSize: 28 },
-  foodInfo: { flex: 1, marginLeft: 12 },
+  foodIconBg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  foodIconText: { fontSize: 20, color: COLORS.accent },
+  foodInfo: { flex: 1, marginLeft: 14 },
   foodName: { fontSize: SIZES.md, fontWeight: '600', color: COLORS.text },
   foodCal: { fontSize: SIZES.xs, color: COLORS.textSecondary, marginTop: 2 },
   foodNutrients: { alignItems: 'flex-end' },
@@ -599,30 +547,40 @@ const styles = StyleSheet.create({
   scheduleRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   timeColumn: {
     width: 70,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingRight: 12,
     alignItems: 'flex-end',
   },
-  timeText: { fontSize: SIZES.sm, fontWeight: '600', color: COLORS.primary },
+  timeText: { fontSize: SIZES.sm, fontWeight: '600' },
+  timelineLine: {
+    width: 20,
+    alignItems: 'center',
+  },
   timelineDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.primary,
-    marginTop: 16,
-    marginHorizontal: 12,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginTop: 18,
+  },
+  timelineConnector: {
+    width: 2,
+    flex: 1,
+    minHeight: 30,
   },
   taskColumn: {
     flex: 1,
     backgroundColor: COLORS.surface,
     padding: 14,
     borderRadius: SIZES.radius,
+    marginLeft: 12,
     marginBottom: 8,
-    ...SHADOWS.small,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   taskText: { fontSize: SIZES.md, color: COLORS.text },
 });
