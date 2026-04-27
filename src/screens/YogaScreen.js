@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, Dimensions, FlatList,
+  SafeAreaView, Dimensions, FlatList, TextInput,
 } from 'react-native';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { YOGA_CATEGORIES, YOGA_POSES } from '../data/yogaPoses';
 import { useTranslation } from 'react-i18next';
+import { getFavorites, toggleFavorite } from '../utils/favorites';
 
 const { width } = Dimensions.get('window');
 
@@ -16,10 +17,39 @@ export default function YogaScreen({ navigation }) {
   const { i18n } = useTranslation();
   const isHindi = i18n.language === 'hi';
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [search, setSearch] = useState('');
+  const [favoriteIds, setFavoriteIds] = useState([]);
 
-  const filteredPoses = selectedCategory === 'all'
-    ? YOGA_POSES
-    : YOGA_POSES.filter(p => p.category.includes(selectedCategory));
+  useEffect(() => {
+    loadFavorites();
+  }, []);
+
+  const loadFavorites = async () => {
+    const favs = await getFavorites();
+    setFavoriteIds(favs.yoga || []);
+  };
+
+  const handleToggleFavorite = useCallback(async (id) => {
+    const newList = await toggleFavorite('yoga', id);
+    setFavoriteIds(newList);
+  }, []);
+
+  const filteredPoses = useMemo(() => {
+    let poses = selectedCategory === 'all'
+      ? YOGA_POSES
+      : selectedCategory === 'favorites'
+      ? YOGA_POSES.filter(p => favoriteIds.includes(p.id))
+      : YOGA_POSES.filter(p => p.category.includes(selectedCategory));
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      poses = poses.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.nameHi.includes(search) ||
+        p.sanskrit.toLowerCase().includes(q)
+      );
+    }
+    return poses;
+  }, [selectedCategory, search, favoriteIds]);
 
   const renderCategoryItem = ({ item }) => (
     <TouchableOpacity
@@ -39,28 +69,36 @@ export default function YogaScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  const renderPoseCard = ({ item }) => (
-    <TouchableOpacity
-      style={styles.poseCard}
-      onPress={() => navigation.navigate('YogaDetail', { pose: item })}
-      activeOpacity={0.8}
-    >
-      <View style={[styles.poseAnimation, { backgroundColor: COLORS.primary + '15' }]}>
-        <Text style={styles.poseEmoji}>🧘</Text>
-      </View>
-      <View style={styles.poseInfo}>
-        <Text style={styles.poseName}>{isHindi ? item.nameHi : item.name}</Text>
-        <Text style={styles.poseSanskrit}>{item.sanskrit}</Text>
-        <View style={styles.poseMeta}>
-          <Text style={styles.difficulty}>
-            {isHindi ? DIFFICULTY_LABELS_HI[item.difficulty] : DIFFICULTY_LABELS[item.difficulty]}
-          </Text>
-          <Text style={styles.duration}>⏱️ {item.duration}</Text>
+  const renderPoseCard = ({ item }) => {
+    const isFav = favoriteIds.includes(item.id);
+    return (
+      <TouchableOpacity
+        style={styles.poseCard}
+        onPress={() => navigation.navigate('YogaDetail', { pose: item })}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.poseAnimation, { backgroundColor: COLORS.primary + '15' }]}>
+          <Text style={styles.poseEmoji}>🧘</Text>
         </View>
-      </View>
-      <Text style={styles.arrow}>›</Text>
-    </TouchableOpacity>
-  );
+        <View style={styles.poseInfo}>
+          <Text style={styles.poseName}>{isHindi ? item.nameHi : item.name}</Text>
+          <Text style={styles.poseSanskrit}>{item.sanskrit}</Text>
+          <View style={styles.poseMeta}>
+            <Text style={styles.difficulty}>
+              {isHindi ? DIFFICULTY_LABELS_HI[item.difficulty] : DIFFICULTY_LABELS[item.difficulty]}
+            </Text>
+            <Text style={styles.duration}>⏱️ {item.duration}</Text>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={styles.favBtn}
+          onPress={() => handleToggleFavorite(item.id)}
+        >
+          <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,6 +109,22 @@ export default function YogaScreen({ navigation }) {
         <Text style={styles.subtitle}>
           {isHindi ? `${YOGA_POSES.length}+ आसन सीखें` : `Learn ${YOGA_POSES.length}+ poses`}
         </Text>
+      </View>
+
+      {/* Search */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
+          placeholder={isHindi ? 'आसन खोजें...' : 'Search poses...'}
+          placeholderTextColor={COLORS.textLight}
+        />
+        {search ? (
+          <TouchableOpacity style={styles.clearBtn} onPress={() => setSearch('')}>
+            <Text style={styles.clearText}>✕</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {/* Categories */}
@@ -89,6 +143,21 @@ export default function YogaScreen({ navigation }) {
               selectedCategory === 'all' && { color: '#fff' },
             ]}>
               {isHindi ? 'सभी' : 'All'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.categoryChip,
+              selectedCategory === 'favorites' && { backgroundColor: '#E74C3C' },
+            ]}
+            onPress={() => setSelectedCategory('favorites')}
+          >
+            <Text style={styles.categoryIcon}>❤️</Text>
+            <Text style={[
+              styles.categoryText,
+              selectedCategory === 'favorites' && { color: '#fff' },
+            ]}>
+              {isHindi ? 'पसंदीदा' : 'Favorites'}
             </Text>
           </TouchableOpacity>
           {YOGA_CATEGORIES.map(cat => (
@@ -119,6 +188,18 @@ export default function YogaScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.posesList}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>
+              {selectedCategory === 'favorites' ? '❤️' : '🔍'}
+            </Text>
+            <Text style={styles.emptyText}>
+              {selectedCategory === 'favorites'
+                ? (isHindi ? 'अभी कोई पसंदीदा नहीं\n❤️ दबाकर जोड़ें' : 'No favorites yet\nTap ❤️ to add')
+                : (isHindi ? 'कोई आसन नहीं मिला' : 'No poses found')}
+            </Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );
@@ -144,6 +225,27 @@ const styles = StyleSheet.create({
     fontSize: SIZES.sm,
     color: COLORS.textSecondary,
   },
+  searchContainer: {
+    paddingHorizontal: SIZES.padding,
+    paddingBottom: 8,
+  },
+  searchInput: {
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: SIZES.radiusFull,
+    fontSize: SIZES.md,
+    color: COLORS.text,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  clearBtn: {
+    position: 'absolute',
+    right: 28,
+    top: 10,
+    padding: 4,
+  },
+  clearText: { fontSize: 16, color: COLORS.textLight },
   categoriesContainer: {
     marginVertical: 12,
   },
@@ -226,5 +328,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.textLight,
     fontWeight: '300',
+  },
+  favBtn: {
+    padding: 8,
+  },
+  favIcon: {
+    fontSize: 22,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingTop: 60,
+  },
+  emptyEmoji: { fontSize: 48, marginBottom: 12 },
+  emptyText: {
+    fontSize: SIZES.md,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

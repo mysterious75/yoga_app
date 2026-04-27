@@ -109,6 +109,11 @@ export default function TrackerScreen() {
   const bmi = calculateBMI();
   const waterPercent = Math.min((waterIntake / DAILY_WATER_GOAL) * 100, 100);
 
+  // Weekly weight chart data (last 7 entries)
+  const weeklyData = weightLog.slice(-7);
+  const maxWeight = weeklyData.length > 0 ? Math.max(...weeklyData.map(e => e.weight)) : 100;
+  const minWeight = weeklyData.length > 0 ? Math.min(...weeklyData.map(e => e.weight)) : 0;
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -205,6 +210,37 @@ export default function TrackerScreen() {
             </View>
           )}
         </View>
+
+        {/* Weekly Weight Chart */}
+        {weeklyData.length >= 2 && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{isHindi ? '📈 साप्ताहिक प्रगति' : '📈 Weekly Progress'}</Text>
+            <View style={styles.chartContainer}>
+              {weeklyData.map((entry, index) => {
+                const range = maxWeight - minWeight || 1;
+                const heightPercent = ((entry.weight - minWeight) / range) * 60 + 40;
+                return (
+                  <View key={index} style={styles.chartBar}>
+                    <Text style={styles.chartValue}>{entry.weight}</Text>
+                    <View style={styles.chartBarTrack}>
+                      <View style={[styles.chartBarFill, { height: `${heightPercent}%` }]} />
+                    </View>
+                    <Text style={styles.chartLabel}>{entry.date.split('/')[1] || entry.date}</Text>
+                  </View>
+                );
+              })}
+            </View>
+            {weeklyData.length >= 2 && (
+              <Text style={styles.chartSummary}>
+                {weeklyData[weeklyData.length - 1].weight > weeklyData[0].weight
+                  ? (isHindi ? `📈 ${(weeklyData[weeklyData.length - 1].weight - weeklyData[0].weight).toFixed(1)} kg बढ़ा` : `📈 Gained ${(weeklyData[weeklyData.length - 1].weight - weeklyData[0].weight).toFixed(1)} kg`)
+                  : weeklyData[weeklyData.length - 1].weight < weeklyData[0].weight
+                  ? (isHindi ? `📉 ${(weeklyData[0].weight - weeklyData[weeklyData.length - 1].weight).toFixed(1)} kg घटा` : `📉 Lost ${(weeklyData[0].weight - weeklyData[weeklyData.length - 1].weight).toFixed(1)} kg`)
+                  : (isHindi ? '➡️ वज़न स्थिर' : '➡️ Weight stable')}
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Sleep Tracker */}
         <View style={styles.card}>
@@ -361,4 +397,34 @@ const styles = StyleSheet.create({
   },
   summaryLabel: { fontSize: SIZES.md, color: COLORS.text },
   summaryValue: { fontSize: SIZES.md, fontWeight: '600', color: COLORS.text },
+  chartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    height: 140,
+    paddingTop: 20,
+  },
+  chartBar: { alignItems: 'center', flex: 1 },
+  chartValue: { fontSize: 10, fontWeight: '600', color: COLORS.text, marginBottom: 4 },
+  chartBarTrack: {
+    width: 24,
+    height: 80,
+    backgroundColor: COLORS.surfaceAlt,
+    borderRadius: 12,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  chartBarFill: {
+    width: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+  },
+  chartLabel: { fontSize: 10, color: COLORS.textSecondary, marginTop: 4 },
+  chartSummary: {
+    fontSize: SIZES.sm,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginTop: 10,
+  },
 });

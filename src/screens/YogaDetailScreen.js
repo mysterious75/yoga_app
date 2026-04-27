@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView, Dimensions, Animated,
 } from 'react-native';
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { useTranslation } from 'react-i18next';
+import { getFavorites, toggleFavorite } from '../utils/favorites';
 
 const { width } = Dimensions.get('window');
 
@@ -41,6 +42,16 @@ export default function YogaDetailScreen({ route, navigation }) {
   const { i18n } = useTranslation();
   const isHindi = i18n.language === 'hi';
   const [activeTab, setActiveTab] = useState('steps');
+  const [isFav, setIsFav] = useState(false);
+
+  useEffect(() => {
+    getFavorites().then(favs => setIsFav((favs.yoga || []).includes(pose.id)));
+  }, []);
+
+  const handleToggleFav = async () => {
+    const newList = await toggleFavorite('yoga', pose.id);
+    setIsFav(newList.includes(pose.id));
+  };
 
   const difficultyStars = '⭐'.repeat(pose.difficulty);
 
@@ -58,6 +69,9 @@ export default function YogaDetailScreen({ route, navigation }) {
         <View style={styles.calorieBadge}>
           <Text style={styles.calorieText}>🔥 {pose.caloriesPerMin}/min</Text>
         </View>
+        <TouchableOpacity style={styles.favBtn} onPress={handleToggleFav}>
+          <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -190,6 +204,8 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radiusFull,
   },
   calorieText: { fontSize: SIZES.xs, fontWeight: '600', color: COLORS.primary },
+  favBtn: { padding: 8 },
+  favIcon: { fontSize: 22 },
   animationContainer: {
     height: 220,
     backgroundColor: COLORS.primary + '08',

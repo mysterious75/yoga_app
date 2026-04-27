@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   SafeAreaView, TextInput,
@@ -6,6 +6,7 @@ import {
 import { COLORS, SIZES, SHADOWS } from '../utils/theme';
 import { FOOD_DATABASE, FOOD_CATEGORIES, CONDITION_FOODS } from '../data/foodDatabase';
 import { useTranslation } from 'react-i18next';
+import { getFavorites, toggleFavorite } from '../utils/favorites';
 
 export default function FoodDatabaseScreen({ navigation }) {
   const { i18n } = useTranslation();
@@ -13,26 +14,47 @@ export default function FoodDatabaseScreen({ navigation }) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showConditions, setShowConditions] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+
+  useEffect(() => {
+    getFavorites().then(favs => setFavoriteIds(favs.food || []));
+  }, []);
+
+  const handleToggleFav = useCallback(async (id) => {
+    const newList = await toggleFavorite('food', id);
+    setFavoriteIds(newList);
+  }, []);
 
   const filteredFoods = FOOD_DATABASE.filter(food => {
     const matchSearch = search === '' ||
       food.name.toLowerCase().includes(search.toLowerCase()) ||
       food.nameHi.includes(search);
-    const matchCategory = selectedCategory === 'all' || food.category === selectedCategory;
+    const matchCategory = selectedCategory === 'all'
+      ? true
+      : selectedCategory === 'favorites'
+      ? favoriteIds.includes(food.id)
+      : food.category === selectedCategory;
     return matchSearch && matchCategory;
   });
 
-  const renderFoodItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.foodCard}
-      onPress={() => navigation.navigate('FoodDetail', { food: item })}
-    >
-      <View style={styles.foodHeader}>
-        <Text style={styles.foodName}>{isHindi ? item.nameHi : item.name}</Text>
-        <View style={styles.calorieBadge}>
-          <Text style={styles.calorieText}>{item.caloriesPer100} cal</Text>
+  const renderFoodItem = ({ item }) => {
+    const isFav = favoriteIds.includes(item.id);
+    return (
+      <TouchableOpacity
+        style={styles.foodCard}
+        onPress={() => navigation.navigate('FoodDetail', { food: item })}
+      >
+        <View style={styles.foodHeader}>
+          <Text style={styles.foodName}>{isHindi ? item.nameHi : item.name}</Text>
+          <View style={styles.foodHeaderRight}>
+            <View style={styles.calorieBadge}>
+              <Text style={styles.calorieText}>{item.caloriesPer100} cal</Text>
+            </View>
+            <TouchableOpacity style={styles.favBtn} onPress={() => handleToggleFav(item.id)}>
+              <Text style={styles.favIcon}>{isFav ? '❤️' : '🤍'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
       <View style={styles.nutrientRow}>
         <Text style={styles.nutrient}>P: {item.protein}g</Text>
         <Text style={styles.nutrient}>C: {item.carbs}g</Text>
@@ -43,7 +65,8 @@ export default function FoodDatabaseScreen({ navigation }) {
         {isHindi ? '🕐 ' : '🕐 '}{isHindi ? item.bestTimeHi : item.bestTime}
       </Text>
     </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +92,7 @@ export default function FoodDatabaseScreen({ navigation }) {
       {/* Category Filter */}
       <FlatList
         horizontal
-        data={[{ id: 'all', name: 'All', nameHi: 'सभी', icon: '📋' }, ...FOOD_CATEGORIES]}
+        data={[{ id: 'all', name: 'All', nameHi: 'सभी', icon: '📋' }, { id: 'favorites', name: 'Favorites', nameHi: 'पसंदीदा', icon: '❤️' }, ...FOOD_CATEGORIES]}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.catChip, selectedCategory === item.id && styles.catChipActive]}
@@ -104,15 +127,20 @@ export default function FoodDatabaseScreen({ navigation }) {
               key={key}
               style={styles.conditionCard}
               onPress={() => {
+                // Filter foods by condition's eat list
+                const eatFoods = condition.eat.map(e => e.toLowerCase());
                 setSearch('');
                 setSelectedCategory('all');
                 setShowConditions(false);
+                // Set search to first food item to show relevant results
+                if (eatFoods.length > 0) {
+                  setSearch(eatFoods[0]);
+                }
               }}
             >
               <Text style={styles.conditionName}>{isHindi ? condition.nameHi : condition.name}</Text>
               <Text style={styles.conditionDesc}>
-                {isHindi ? '✅ ' : '✅ '}
-                {condition.eat.slice(0, 3).join(', ')}...
+                ✅ {condition.eat.slice(0, 3).join(', ')}...
               </Text>
             </TouchableOpacity>
           ))}
@@ -220,6 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   foodName: { fontSize: SIZES.base, fontWeight: '700', color: COLORS.text, flex: 1 },
+  foodHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   calorieBadge: {
     backgroundColor: COLORS.primary + '15',
     paddingHorizontal: 10,
@@ -230,4 +259,6 @@ const styles = StyleSheet.create({
   nutrientRow: { flexDirection: 'row', gap: 12, marginBottom: 6 },
   nutrient: { fontSize: SIZES.xs, color: COLORS.textSecondary },
   bestTime: { fontSize: SIZES.xs, color: COLORS.accent, fontWeight: '500' },
+  favBtn: { padding: 4 },
+  favIcon: { fontSize: 18 },
 });
